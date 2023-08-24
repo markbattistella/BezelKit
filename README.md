@@ -69,7 +69,8 @@ let innerBezel = outerBezel - distance  // Perfect ratio
 
 By following this approach, you can ensure that your UI elements scale perfectly in relation to the device's bezel size.
 
-![Perfect scaling](Data/ratio.jpg)
+[![Perfect scaling](Data/ratio.jpg)
+](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/ratio.jpg?token=GHSAT0AAAAAACCB5647OS44Q3IFS266W6VOZHHBMHQ)
 
 ### Setting a Fallback Bezel Size
 
@@ -151,7 +152,7 @@ If you wish to update or extend the list of device bezel sizes, you can easily d
 
 1. **Adding to CSV**: Add more devices and their identifiers to the existing CSV file. Make sure the friendly names in the CSV match the "Device Type" from the `Create New Simulator` screen in Xcode.
 
-   ![Add New Simulator](Data/simulator.jpg)
+   [![Add New Simulator](Data/simulator.jpg)](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/simulator.jpg?token=GHSAT0AAAAAACCB5646RFUFY2EGGRAM44ASZHHBM6A)
 
 2. **Problematic Simulators**: If any simulators are listed in the `problematic-simulators.txt`, you can move them back to `target-simulators.txt` and attempt to run the script again to see if the issue is resolved.
 
