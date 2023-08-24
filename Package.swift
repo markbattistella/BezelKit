@@ -18,7 +18,8 @@ let package = Package(
 	targets: [
 		.target(
 			name: "BezelKit",
-			dependencies: []
+			exclude: ["../Generator"],
+			resources: [.copy("Resources/bezelData.min.json")]
 		)
 	]
 )

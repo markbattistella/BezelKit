@@ -3,7 +3,6 @@
 ![Language](https://img.shields.io/badge/Language-Swift-white?labelColor=orange&style=flat)
 ![Language](https://img.shields.io/badge/-SwiftUI-white?labelColor=orange&style=flat)
 ![Language](https://img.shields.io/badge/-UIKit-white?labelColor=orange&style=flat)
-![Language](https://img.shields.io/badge/-AppKit-white?labelColor=orange&style=flat)
 
 ![Platforms](https://img.shields.io/badge/Platform-iOS%2011+-white?labelColor=gray&style=flat)
 ![Platforms](https://img.shields.io/badge/Platform-iPadOS%2013+-white?labelColor=gray&style=flat)
@@ -43,7 +42,19 @@ The BezelKit package uses Swift Package Manager (SPM) for easy and convenient di
 
 ## Usage
 
-As `BezelKit` provides public access to the extensions, there is no need to import the package into your files. You can access or set the fallback directly through `CGFloat`.
+The easiest and quickest way to use `BezelKit` is to create an extension on `CGFloat`, and create your own static variable that references the `.deviceBezel` data:
+
+```swift
+extension CGFloat {
+  static let deviceRadius = Self.deviceBezel
+}
+```
+
+Remember to import the `BezelKit` module:
+
+```swift
+import BezelKit
+```
 
 ### General Usage
 
@@ -74,11 +85,11 @@ By following this approach, you can ensure that your UI elements scale perfectly
 
 ### Setting a Fallback Bezel Size
 
-It's a good idea to set a fallback bezel size, which will be used if the package can't determine the bezel size for the current device.
+By default, if the package can't determine the bezel size for the current device, `CGFloat.deviceBezel` will return a fallback value of `0.0`.
 
-Setting a fallback size is aimed so you don't result in a value of `0.00` being returned, but a consistent rounded value.
+To set a custom fallback size, you can do so at the app initialization point, like `application(_:didFinishLaunchingWithOptions:)` in `AppDelegate.swift`, or in an in an `.onAppear()` in SwiftUI.
 
-You can set this fallback value at the app initialisation point, like `application(_:didFinishLaunchingWithOptions:)` in `AppDelegate.swift`, so you only have to set it once:
+You only have to set the `setFallbackDeviceBezel()` once, so it's best to do it as early as possible to allow it to carry thoughout your app.
 
 ```swift
 import UIKit
@@ -164,7 +175,7 @@ Contributions are more than welcome. If you find a bug or have an idea for an en
 
 ## Licence
 
-The BezelKit package is released under the MIT license. See [LICENCE](https://github.com/markbattistella/BezelKit/blob/main/LICENCE) for more information.
+The BezelKit package is released under the MIT licence. See [LICENCE](https://github.com/markbattistella/BezelKit/blob/main/LICENCE) for more information.
 
 ---
 
