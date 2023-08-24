@@ -160,7 +160,7 @@ const DEFAULTS = {
 	 * The location to save the output merged JSON data.
 	 * @type {string}
 	 */
-	mergedOutputPrefix: '../BezelKit/bezelData',
+	mergedOutputPrefix: '../BezelKit/Resources/bezelData',
 
 	/**
 	 * Whether to generate a log file for reporting or not.
