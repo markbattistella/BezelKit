@@ -19,7 +19,7 @@ let package = Package(
 		.target(
 			name: "BezelKit",
 			exclude: ["../Generator"],
-			resources: [.copy("Resources/bezelData.min.json")]
+			resources: [.copy("Resources/bezel-data-min.json")]
 		)
 	]
 )
