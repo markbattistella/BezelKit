@@ -51,7 +51,7 @@ A nice looking solution would look like this:
 
 ### Devices
 
-In terms of the devices supported though, it covers from the initial versions of all devices. See the [supported device list](https://raw.githubusercontent.com/markbattistella/BezelKit/main/SupportedDeviceList.md).
+In terms of the devices supported though, it covers from the initial versions of all devices. See the [supported device list](https://github.com/markbattistella/BezelKit/blob/main/SupportedDeviceList.md).
 
 ## Installation
 
