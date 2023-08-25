@@ -39,7 +39,7 @@ public class DeviceBezel {
 	private static func loadDeviceData() throws {
 
 		// Attempt to find the URL of the JSON file in the module bundle.
-		guard let url = Bundle.module.url(forResource: "bezelData.min", withExtension: "json") else {
+		guard let url = Bundle.module.url(forResource: "bezel-data-min", withExtension: "json") else {
 			throw NSError(domain: "ResourceNotFound", code: 404, userInfo: nil)
 		}
 		let data = try Data(contentsOf: url)

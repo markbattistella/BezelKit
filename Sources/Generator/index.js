@@ -157,10 +157,16 @@ const DEFAULTS = {
 	bundleID: 'com.mb.FetchBezel',
 
 	/**
-	 * The location to save the output merged JSON data.
+	 * The location to save the output merged JSON data for next run.
 	 * @type {string}
 	 */
-	mergedOutputPrefix: '../BezelKit/Resources/bezelData',
+	mergedOutputFilePath: './cached-data.json',
+
+	/**
+	 * The location to save the output merged JSON data for use in the Package.
+	 * @type {string}
+	 */
+	bezelKitResources: '../BezelKit/Resources/bezel-data-min.json',
 
 	/**
 	 * Whether to generate a log file for reporting or not.
@@ -334,7 +340,7 @@ const append = async (data, filePath) => {
 
 		// Append the data item if it's not already present
 		if (!uniqueLines.has(data)) {
-			await fsp.appendFile(filePath, `${data}\n`, 'utf-8');
+			await fsp.appendFile(filePath, `\n${data}`, 'utf-8');
 			uniqueLines.add(data);
 		}
 	} catch (error) {
@@ -431,6 +437,10 @@ const getSettingValue = (settings, key) => {
  */
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const isEmptyObject = (obj) => {
+	return Object.keys(obj).length === 0 && obj.constructor === Object;
+};
+
 
 /**
  * Initializes the data extraction process.
@@ -442,12 +452,13 @@ const init = async () => {
 
 		// See: #2
 		const uniqueSimulatorIdentifiers = await getFilteredSimulators(
-			VARIABLES.targetSimulatorListPath,
-			VARIABLES.completedSimulatorListPath,
-			VARIABLES.problematicSimulatorListPath
+			VARIABLES.targetSims,
+			VARIABLES.completedSims,
+			VARIABLES.problematicSims
 		);
 
-		// See: #3
+		// Check to see if the simulator list has anything to parse.
+		// Otherwise we gracefully exit.
 		if (uniqueSimulatorIdentifiers.length === 0) {
 			console.log('[i] There are no new target simulators');
 			console.log('    ↳ Check that the list is either not empty, or the items do not already exist in the completed or problematic lists.');
@@ -455,7 +466,7 @@ const init = async () => {
 		}
 
 		// See: #4
-		const parsedDatabaseOfModels = await convertCSVtoJson(VARIABLES.deviceMappingCsvPath);
+		const parsedDatabaseOfModels = await convertCSVtoJson(VARIABLES.deviceCsv);
 
 		// See: #5
 		const targetSimulatorObjectData = getSimulatorObjectData(
@@ -465,8 +476,8 @@ const init = async () => {
 
 		// See: #6
 		const buildSettings = getAppBuildPath(
-			VARIABLES.simulatorDataExtractionProjectPath,
-			VARIABLES.dataExtractionSchemeName
+			VARIABLES.projectPath,
+			VARIABLES.schemeName
 		);
 
 		// See: #7
@@ -476,21 +487,39 @@ const init = async () => {
 		);
 
 		// See: #8
+		const lastRunData = await getLastRunData(
+			VARIABLES.mergedOutputFilePath
+		);
+		
+		// We use this to check if there is the last run JSON to update that.
+		// Otherwise if there isn't, we assume it is first run, and return the CSV -> JSON.
+		let data;
+		if (lastRunData && !isEmptyObject(lastRunData)) {
+			data = lastRunData;
+		} else {
+			data = parsedDatabaseOfModels;
+		}
+
+		// See: #9
 		const result = mergeData(
-			parsedDatabaseOfModels,
+			data,
 			getSimulatorData
 		);
 
-		// See: #9
-		await saveData(VARIABLES.mergedLocalOutputPrefix, result);
-
 		// See: #10
-		await clearFile(VARIABLES.targetSimulatorListPath);
+		await saveData(
+			VARIABLES.mergedOutputFilePath,
+			VARIABLES.bezelKitResources,
+			result
+		);
 
 		// See: #11
+		await clearFile(VARIABLES.targetSims);
+
+		// See: #12
 		await sortFiles([
-			VARIABLES.completedSimulatorListPath,
-			VARIABLES.problematicSimulatorListPath
+			VARIABLES.completedSims,
+			VARIABLES.problematicSims
 		]);
 
 	} catch (error) {
@@ -506,7 +535,26 @@ const init = async () => {
  */
 const getHelpDialogue = () => {
 	if (ARGS.help || ARGS.h) {
-		console.log("This is the help message");
+		console.log(
+			"---------------------------------------------------\n"    +
+			"--               BezelKit Generator              --\n"    +
+			"---------------------------------------------------\n"    +
+			"\n"                                                       +
+			"Usage: node index.js [options]\n\n"                       +
+			"Options:\n"                                               +
+			"  --deviceCsv\n\tThe CSV file with the Apple model and identifiers\n" +
+			"  --targetSims\n\tA text file with the identifiers you wish to get data from\n" +
+			"  --completedSims\n\tA text file of past, completed identifiers\n" +
+			"  --problematicSims\n\tA text file of error identifiers - either not found or error in creation or use\n" +
+			"  --projectPath\n\tPath to the Xcode project to fetch bezel sizes\n" +
+			"  --schemeName\n\tSceheme for the aboce Xcode project\n" +
+			"  --bundleID\n\tThe app bundle ID of the above project for easy install\n" +
+			"  --mergedOutputFilePath\n\tFile location to output local JSON file with data\n" +
+			"  --bezelKitResources\n\tThe JSON file used in the Package\n" +
+			"  --debug\n\tLog files to output or supress them\n" +
+			"  --help\n\tDisplay this screen\n\n" +
+			"Chances are you won't need to override any of these, but they're built in for growth or custom setups. Mainly would be good if you need use your own CSV file or custom list of device identifiers. Most beneficial section is the projectPath, schemeName, and bundleID where you can use that logic for your own app.\n\n"
+		);
 		process.exit(0);
 	}
 };
@@ -598,7 +646,6 @@ const convertCSVtoJson = async (csvFilePath) => {
 
 	return output;
 };
-
 
 /**
  * 5a. Finds the device name in the given database based on its identifier.
@@ -708,8 +755,8 @@ const processIdentifier = (identifier, database) => {
 		// Move the identifier to problematic-list file and return
 		moveData(
 			identifier,
-			VARIABLES.targetSimulatorListPath,
-			VARIABLES.problematicSimulatorListPath
+			VARIABLES.targetSims,
+			VARIABLES.problematicSims
 		);
 		return null;
 	}
@@ -732,8 +779,8 @@ const processIdentifier = (identifier, database) => {
 		console.warn('    ↳ Moving the identifier to problematic-list file');
 		moveData(
 			identifier,
-			VARIABLES.targetSimulatorListPath,
-			VARIABLES.problematicSimulatorListPath
+			VARIABLES.targetSims,
+			VARIABLES.problematicSims
 		);
 		return null;
 	}
@@ -745,8 +792,8 @@ const processIdentifier = (identifier, database) => {
 		console.warn('    ↳ Moving the identifier to problematic-list file');
 		moveData(
 			identifier,
-			VARIABLES.targetSimulatorListPath,
-			VARIABLES.problematicSimulatorListPath
+			VARIABLES.targetSims,
+			VARIABLES.problematicSims
 		);
 		return null;
 	}
@@ -757,8 +804,8 @@ const processIdentifier = (identifier, database) => {
 	// Move the identifier to completed-list file
 	moveData(
 		identifier,
-		VARIABLES.targetSimulatorListPath,
-		VARIABLES.completedSimulatorListPath
+		VARIABLES.targetSims,
+		VARIABLES.completedSims
 	);
 
 	return { udid, deviceName, identifier, state };
@@ -823,7 +870,7 @@ const getAppBuildPath = (projectPath, projectScheme) => {
  */
 const getDataFromSimulators = async (appBuildPath, simulators) => {
 	const allSimulatorData = [];
-	const bundleID = VARIABLES.appInstallationBundleID;
+	const bundleID = VARIABLES.bundleID;
 
 	for (const simulator of simulators) {
 
@@ -893,7 +940,18 @@ const getDataFromSimulators = async (appBuildPath, simulators) => {
 };
 
 /**
- * 8. Merges new data into the original device data using matching identifiers.
+ * 8. Gets and parses the previously run JSON data.
+ * 
+ * @param {string} dataFile - The file path to the JSON file
+ * @returns {Object} The parsed JSON data.
+ */
+const getLastRunData = async (dataFile) => {
+	const jsonData = await fsp.readFile(dataFile);
+	return JSON.parse(jsonData);
+};
+
+/**
+ * 9. Merges new data into the original device data using matching identifiers.
  *
  * @param {Object} original - The original device data object.
  * @param {Object[]} newData - An array of device data to merge into the original.
@@ -918,30 +976,29 @@ const mergeData = (original, newData) => {
 };
 
 /**
- * 9. Asynchronously saves data into two JSON files: one compressed and one uncompressed.
+ * 10. Asynchronously saves data into a JSON files: one uncompressed, the other compressed.
  *
- * @param {string} filePath - The base file path without the extension.
- *                            Two files will be created: <filePath>.min.json (compressed)
- *                            and <filePath>.json (uncompressed).
- * @param {object} result - The data object to be saved in the files.
+ * @param {string} uncompressedFilePath - The base file path for the uncompressed JSON file.
+ * @param {string} compressedFilePath - The base file path for the compressed JSON file.
+ * @param {object} data - The data object to be saved in the files.
  *
  * @throws {Error} If there's an error writing to the files.
  *
- * @returns {Promise<void>} A promise that resolves when both files have been written.
+ * @returns {Promise<void>} A promise that resolves when the files have been written.
  */
-const saveData = async (filePath, result) => {
+const saveData = async (uncompressedFilePath, compressedFilePath, data) => {
 	await fsp.writeFile(
-		`${filePath}.min.json`,
-		JSON.stringify(result)
+		uncompressedFilePath,
+		JSON.stringify(data, null, 2)
 	);
 	await fsp.writeFile(
-		`${filePath}.json`,
-		JSON.stringify(result, null, 2)
+		compressedFilePath,
+		JSON.stringify(data, null, null)
 	);
 };
 
 /**
- * 10. Asynchronously clears the content of a file.
+ * 11. Asynchronously clears the content of a file.
  *
  * @param {string} filePath - The path to the file that needs to be cleared.
  *
@@ -954,7 +1011,7 @@ const clearFile = async (filePath) => {
 };
 
 /**
- * Asynchronously sorts the lines of multiple text files and writes the sorted content to new files.
+ * 12. Asynchronously sorts the lines of multiple text files and writes the sorted content to new files.
  *
  * @param {string[]} filePaths - An array of paths to the text files that will be sorted.
  * @throws Will log an error if sorting of any file fails.
@@ -974,14 +1031,15 @@ const sortFiles = async (filePaths) => {
  * @returns {Object} A configuration object with variable values.
  */
 const VARIABLES = ((ARGS) => ({
-	deviceMappingCsvPath: assignOrDefault(ARGS.deviceCsv, DEFAULTS.deviceCsv),
-	targetSimulatorListPath: assignOrDefault(ARGS.targetSims, DEFAULTS.targetSims),
-	completedSimulatorListPath: assignOrDefault(ARGS.completedSims, DEFAULTS.completedSims),
-	problematicSimulatorListPath: assignOrDefault(ARGS.problematicSims, DEFAULTS.problematicSims),
-	simulatorDataExtractionProjectPath: assignOrDefault(ARGS.projectPath, DEFAULTS.projectPath),
-	dataExtractionSchemeName: assignOrDefault(ARGS.schemeName, DEFAULTS.schemeName),
-	appInstallationBundleID: assignOrDefault(ARGS.bundleID, DEFAULTS.bundleID),
-	mergedLocalOutputPrefix: assignOrDefault(ARGS.mergedOutputPrefix, DEFAULTS.mergedOutputPrefix),
+	deviceCsv: assignOrDefault(ARGS.deviceCsv, DEFAULTS.deviceCsv),
+	targetSims: assignOrDefault(ARGS.targetSims, DEFAULTS.targetSims),
+	completedSims: assignOrDefault(ARGS.completedSims, DEFAULTS.completedSims),
+	problematicSims: assignOrDefault(ARGS.problematicSims, DEFAULTS.problematicSims),
+	projectPath: assignOrDefault(ARGS.projectPath, DEFAULTS.projectPath),
+	schemeName: assignOrDefault(ARGS.schemeName, DEFAULTS.schemeName),
+	bundleID: assignOrDefault(ARGS.bundleID, DEFAULTS.bundleID),
+	mergedOutputFilePath: assignOrDefault(ARGS.mergedOutputFilePath, DEFAULTS.mergedOutputFilePath),
+	bezelKitResources: assignOrDefault(ARGS.bezelKitResources, DEFAULTS.bezelKitResources),
 	debug: assignOrDefault(ARGS.debug, DEFAULTS.debug)
 }))(ARGS);
 
