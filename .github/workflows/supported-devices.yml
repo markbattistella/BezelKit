@@ -23,9 +23,6 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Convert JSON to Markdown
         run: node ./.github/supported-devices.js
 
