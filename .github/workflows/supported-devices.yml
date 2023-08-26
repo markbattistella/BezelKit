@@ -17,21 +17,35 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '14'
+
       - name: Install dependencies
         run: npm install
+
+      - name: Convert JSON to Markdown
+        run: node ./.github/supported-devices.js
+
       - name: Get date
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_ENV"
-      - name: Convert JSON to Markdown
-        run: node ./.github/supported-devices.js
-      - name: Create New Pull Request If Needed
-        uses: peter-evans/create-pull-request@v5
+
+      - name: Commit changes
+        run: |
+          git config user.name "mb-actions[bot]"
+          git config user.email "markbattistella-bot@users.noreply.github.com"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update SupportedDeviceList.md"
+
+      - name: Create Pull Request
+        id: create-pr
+        uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.PAT }}
-          title: ${{ env.date }} - Compressed Images
-          branch-suffix: timestamp
-          commit-message: Update SupportedDeviceList.md
+          token: ${{ secrets.BOT_ACCESS_TOKEN }}
+          commit-message: 'Auto-update SupportedDeviceList.md'
+          title: ${{ env.date }} -  Auto-update SupportedDeviceList.md
+          body: 'This is an auto-generated PR to update the SupportedDeviceList.md'
+          branch: 'auto-update/supported-devices'
