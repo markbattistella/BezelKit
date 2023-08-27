@@ -111,11 +111,15 @@ By following this approach, you can ensure that your UI elements scale perfectly
 
 ### Setting a Fallback Bezel Size
 
-By default, if the package can't determine the bezel size for the current device, `CGFloat.BezelKit` will return a fallback value of `0.0`.
+The package provides an easy way to specify a fallback bezel size. By default, the `CGFloat.deviceBezel` attribute returns `0.0` if it cannot ascertain the device's bezel size.
 
-To set a custom fallback size, you can do so at the app initialisation point, like `application(_:didFinishLaunchingWithOptions:)` in `AppDelegate.swift`, or in an `.onAppear()` in SwiftUI.
+#### Enable Zero-Check Option
 
-You only have to set the `setFallbackDeviceBezel()` once, so it's best to do it as early as possible to allow it to carry through your app.
+In addition to specifying the fallback value, you have the option to return the fallback value even when the bezel size is determined to be zero.
+
+#### UIKit: Setting the Fallback in AppDelegate
+
+For UIKit-based applications, you can set the fallback value in the `AppDelegate` within the `application(_:didFinishLaunchingWithOptions:)` method. This is the earliest point at which you can set the fallback value for your app.
 
 ```swift
 import UIKit
@@ -123,32 +127,62 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
-  // Sets a fallback value of 10.0
-  CGFloat.setFallbackBezelKit(10.0)
-  return true
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    // Sets a fallback value of 10.0 and enables zero-check
+    CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
+    return true
   }
 }
 ```
 
-### Effects of Setting a Fallback
+#### SwiftUI: Setting the Fallback on Appear
 
-If you've set a fallback value, `CGFloat.BezelKit` will return this fallback value when it cannot determine the bezel size for the current device.
+For SwiftUI applications, you can set this value in the `.onAppear()` modifier for your main content view.
 
 ```swift
-// With fallback set to 10.0
-let currentBezel = CGFloat.BezelKit
+import SwiftUI
+
+@main
+struct YourApp: App {
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+        .onAppear() {
+          // Sets a fallback value of 10.0 and enables zero-check
+          CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
+        }
+    }
+  }
+}
+
+struct ContentView: View {
+  var body: some View {
+    Text("Hello, SwiftUI!")
+  }
+}
+```
+
+#### Note
+
+You only need to call `setFallbackDeviceBezel(_:ifZero:)` once. Doing this as early as possible ensures the fallback setting is applied throughout your application.
+
+### Effects of Setting a Fallback
+
+If you've set a fallback value, `CGFloat.deviceBezel` will return this fallback value when it cannot determine the bezel size for the current device, or optionally, when the bezel size is zero.
+
+```swift
+// With fallback set to 10.0 and zero check enabled
+let currentBezel = CGFloat.deviceBezel
 print("Current device bezel: \(currentBezel)")
 
-// Output will be 10.0 if the device is not in the JSON data
+// Output will be 10.0 if the device is not in the JSON data or the bezel is zero
 ```
 
 If no fallback is set, `CGFloat.BezelKit` defaults to `0.0` when the device-specific bezel size is unavailable.
 
 ```swift
-// With no fallback set
-let currentBezel = CGFloat.BezelKit
+// With no fallback set and zero check disabled
+let currentBezel = CGFloat.deviceBezel
 print("Current device bezel: \(currentBezel)")
 
 // Output will be 0.0 if the device is not in the JSON data
@@ -238,13 +272,14 @@ By following these steps, you can continually update and maintain the device bez
 
 ## Contributing
 
-Contributions are more than welcome. If you find a bug or have an idea for an enhancement, please open an issue or provide a pull request. Please follow the code style present in the current code base when making contributions.
+Contributions are more than welcome. If you find a bug or have an idea for an enhancement, please open an issue or provide a pull request.
+
+Please follow the code style present in the current code base when making contributions.
 
 **Note**: any pull requests need to have the title in the following format, otherwise it will be rejected.
 
 ```text
 YYYY-mm-dd - {title}
-
 eg. 2023-08-24 - Updated README file
 ```
 
