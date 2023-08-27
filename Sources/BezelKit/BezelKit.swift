@@ -132,17 +132,27 @@ public extension CGFloat {
 	// Fallback value if bezel size is unavailable.
 	private static var fallbackBezelValue: CGFloat = 0.0
 
-	/// Returns the bezel size for the current device, or the fallback value if unavailable.
+	// Flag to determine if zero should be considered as a fallback condition.
+	private static var shouldFallbackIfZero: Bool = false
+
+	/// Returns the bezel size for the current device, or the fallback value if unavailable or zero.
 	///
 	/// - Returns: A `CGFloat` representing the bezel size or the fallback value.
 	static var deviceBezel: CGFloat {
-		return DeviceBezel.currentBezel ?? fallbackBezelValue
+		if let currentBezel = DeviceBezel.currentBezel,
+		   !(shouldFallbackIfZero && currentBezel == 0.0) {
+			return currentBezel
+		}
+		return fallbackBezelValue
 	}
 
-	/// Sets a fallback value to be used when the bezel size for the current device is unavailable.
+	/// Sets a fallback value to be used when the bezel size for the current device is unavailable or zero.
 	///
-	/// - Parameter value: The fallback `CGFloat` value to be used.
-	static func setFallbackDeviceBezel(_ value: CGFloat) {
+	/// - Parameters:
+	///   - value: The fallback `CGFloat` value to be used.
+	///   - zero: A `Bool` flag to determine if a zero value should trigger the fallback.
+	static func setFallbackDeviceBezel(_ value: CGFloat, ifZero zero: Bool = false) {
 		fallbackBezelValue = value
+		shouldFallbackIfZero = zero
 	}
 }
