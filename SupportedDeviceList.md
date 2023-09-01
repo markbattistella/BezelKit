@@ -94,3 +94,8 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPad Pro (12.9-inch) (4th generation) | `iPad8,11`, `iPad8,12` | `18` |
 | iPad Pro (12.9-inch) (5th generation) | `iPad13,8`, `iPad13,9`, `iPad13,10`, `iPad13,11` | `18` |
 | iPad Pro (12.9-inch) (6th generation) | `iPad14,5`, `iPad14,6` | `18` |
+
+## Watch
+
+| Device                      | Model Identifier | Bezel Size |
+|-----------------------------|------------------|------------|
