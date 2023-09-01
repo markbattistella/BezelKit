@@ -27,7 +27,7 @@ By providing an easy-to-use API, `BezelKit` allows developers to focus more on t
 > - No public API from Apple for fetching bezel sizes.
 > - Using internal APIs can jeopardise App Store eligibility.
 > - Static bezel values can cause UI distortions across devices.
-> - `DeviceBezel` offers an easy-to-use solution for accurate bezel metrics.
+> - `BezelKit` offers an easy-to-use solution for accurate bezel metrics.
 
 Apple currently does not offer a public API for fetching the bezel radius of its devices.
 
@@ -76,15 +76,7 @@ Using `BezelKit` is simple and can help you avoid complexities related to device
    import BezelKit
    ```
 
-2. Create a `CGFloat` extension to add your own static variable for easier access:
-
-   ```swift
-   extension CGFloat {
-     static let deviceRadius = Self.deviceBezel
-   }
-   ```
-
-3. Access the device bezel size:
+1. Access the device bezel size:
 
    ```swift
    let currentBezel = CGFloat.deviceBezel
@@ -229,6 +221,14 @@ struct ContentView: View {
 
 As you can see, with no `setFallbackBezelKit` set, the iPhone SE (3rd generation) value is set to `0.0` and results in no curve. However, all other curved devices have a consistent look.
 
+## Things to note
+
+`BezelKit` **does not** currently support the affects from display zooming. When the generator runs, it perfoms all extractions on the "Standard" zoom level of the device.
+
+If this was run on the "Zoomed" level, then the bezel radius would be different. However, since the physical device cannot change based on the zoom level, using "Standard" is the correct CGFloat number.
+
+There is also no way to automate zoom levels in `xcrun simctl` so it would have to be a manual inclusion, and at this point in time (unless raised via Issues) there is no realy benefit for using the zoomed value for `_displayRoundedCorner`.
+
 ## Generating New Bezels
 
 You can generate new bezel data for additional devices using the `index.js` NodeJS script located in the `Sources/Generator` folder.
@@ -282,6 +282,8 @@ Please follow the code style present in the current code base when making contri
 YYYY-mm-dd - {title}
 eg. 2023-08-24 - Updated README file
 ```
+
+I like to track the day from logged request to completion, allowing sorting, and extraction of data. It helps me know how long things have been pending and provides OCD structure.
 
 ## Licence
 
