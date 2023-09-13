@@ -516,7 +516,7 @@ const init = async () => {
 		);
 
 		// See: #11
-		await clearFile(VARIABLES.targetSims);
+		//await clearFile(VARIABLES.targetSims);
 
 		// See: #12
 		await sortFiles([
@@ -804,6 +804,9 @@ const processIdentifier = (identifier, database) => {
 	const state = findSimulatorState(udid);
 
 	// Move the identifier to completed-list file
+	console.warn(`[i] INFO: moving identifier to completed-list file"`);
+	console.warn('    ↳ Identifier: ${identifier}');
+	console.warn('    ↳ Destination: ${VARIABLES.completedSims}');
 	moveData(
 		identifier,
 		VARIABLES.targetSims,
