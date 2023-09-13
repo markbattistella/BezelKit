@@ -4,10 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "BezelKit",
-	platforms: [
-		.iOS(.v11),
-		.watchOS(.v4)
-	],
+	platforms: [.iOS(.v11)],
     products: [
         .library(
 			name: "BezelKit",
@@ -18,8 +15,9 @@ let package = Package(
 	targets: [
 		.target(
 			name: "BezelKit",
-			exclude: ["../Generator"],
-			resources: [.copy("Resources/bezel-data-min.json")]
+			resources: [
+				.copy("Resources/bezel.min.json")
+			]
 		)
 	]
 )

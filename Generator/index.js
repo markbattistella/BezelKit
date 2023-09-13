@@ -4,7 +4,7 @@
  * This script extracts bezel data from simulators and merges it into a device database.
  *
  * Author: Mark Battistella
- * Version: 1.0.0
+ * Version: 1.1.0
  * Licence: MIT
  * Contact: @markbattistella
  * Website: https://markbattistella.com
@@ -116,27 +116,27 @@ const DEFAULTS = {
 	 * The CSV file which contains all the device models and internal identifiers.
 	 * @type {string}
 	 */
-	deviceCsv: './apple-device-database.csv',
+	deviceCsv: './Simulators/apple-device-database.csv',
 
 	/**
 	 * The file containing the list of target simulators from which to gather bezel data.
 	 * @type {string}
 	 */
-	targetSims: './target-simulators.txt',
+	targetSims: './Simulators/target-simulators.txt',
 
 	/**
 	 * The file containing the list of simulators from which bezel data has already been extracted.
 	 * This is used for filtering to prevent overloading the script's runtime.
 	 * @type {string}
 	 */
-	completedSims: './completed-simulators.txt',
+	completedSims: './Simulators/completed-simulators.txt',
 
 	/**
 	 * The file containing the list of simulator identifiers that have no runtime installed,
 	 * but have not been run previously. Used to identify new devices without runtimes.
 	 * @type {string}
 	 */
-	problematicSims: './problematic-simulators.txt',
+	problematicSims: './Simulators/problematic-simulators.txt',
 
 	/**
 	 * The path to the Xcode project used to extract bezel data.
@@ -160,13 +160,13 @@ const DEFAULTS = {
 	 * The location to save the output merged JSON data for next run.
 	 * @type {string}
 	 */
-	mergedOutputFilePath: './cached-data.json',
+	mergedOutputFilePath: './cache.json',
 
 	/**
 	 * The location to save the output merged JSON data for use in the Package.
 	 * @type {string}
 	 */
-	bezelKitResources: '../BezelKit/Resources/bezel-data-min.json',
+	bezelKitResources: '../Sources/BezelKit/Resources/bezel.min.json',
 
 	/**
 	 * Whether to generate a log file for reporting or not.
@@ -461,7 +461,9 @@ const init = async () => {
 		// Otherwise we gracefully exit.
 		if (uniqueSimulatorIdentifiers.length === 0) {
 			console.log('[i] There are no new target simulators');
-			console.log('    ↳ Check that the list is either not empty, or the items do not already exist in the completed or problematic lists.');
+			console.log('    ↳ Check that the list is either (a) not empty,');
+			console.log('      or (b) the items do not already exist in the');
+			console.log('      completed or problematic lists.');
 			process.exit(0);
 		}
 

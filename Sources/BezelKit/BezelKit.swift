@@ -9,14 +9,14 @@ import UIKit
 public class DeviceBezel {
 
 	/// A cache for device bezel sizes, using device identifiers as keys.
-	private static var deviceCache: [String: CGFloat] = [:]
+	private static var deviceCache: [String : CGFloat] = [:]
 
 	/// Stores all device information after the initial load.
 	private static var allDevices: AllDevices?
 
 	/// Enum to categorise different types of devices.
 	private enum DeviceCategory: String, CaseIterable {
-		case iPod, iPhone, iPad, Watch
+		case iPod, iPhone, iPad
 	}
 
 	/// Struct to represent each device type.
@@ -31,7 +31,6 @@ public class DeviceBezel {
 		let iPod: [DeviceType]
 		let iPhone: [DeviceType]
 		let iPad: [DeviceType]
-		let Watch: [DeviceType]
 	}
 
 	/// Loads and caches device information from the embedded JSON file.
@@ -39,7 +38,7 @@ public class DeviceBezel {
 	private static func loadDeviceData() throws {
 
 		// Attempt to find the URL of the JSON file in the module bundle.
-		guard let url = Bundle.module.url(forResource: "bezel-data-min", withExtension: "json") else {
+		guard let url = Bundle.module.url(forResource: "bezel.min", withExtension: "json") else {
 			throw NSError(domain: "ResourceNotFound", code: 404, userInfo: nil)
 		}
 		let data = try Data(contentsOf: url)
@@ -61,8 +60,6 @@ public class DeviceBezel {
 					deviceTypes = data.iPhone
 				case .iPad:
 					deviceTypes = data.iPad
-				case .Watch:
-					deviceTypes = data.Watch
 			}
 
 			for deviceType in deviceTypes {
