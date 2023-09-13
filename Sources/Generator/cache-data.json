@@ -308,6 +308,34 @@
       "bezel": 55
     },
     {
+      "device": "iPhone 15",
+      "identifiers": [
+        "iPhone15,4"
+      ],
+      "bezel": 55
+    },
+    {
+      "device": "iPhone 15 Plus",
+      "identifiers": [
+        "iPhone15,5"
+      ],
+      "bezel": 55
+    },
+    {
+      "device": "iPhone 15 Pro",
+      "identifiers": [
+        "iPhone16,1"
+      ],
+      "bezel": 55
+    },
+    {
+      "device": "iPhone 15 Pro Max",
+      "identifiers": [
+        "iPhone16,2"
+      ],
+      "bezel": 55
+    },
+    {
       "device": "iPhone SE (1st generation)",
       "identifiers": [
         "iPhone8,4"
