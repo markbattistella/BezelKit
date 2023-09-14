@@ -29,20 +29,30 @@
 // Import the 'fs' module, which provides an interface for file system operations.
 const fs = require('fs');
 
-// Import the 'fs.promises' module, an extension of 'fs' that offers promise-based file system methods.
+// Import the 'fs.promises' module, an extension of 'fs' that offers promise-based 
+// file system methods.
 const fsp = require('fs').promises;
 
-// Import the 'readline' module for creating interactive command-line interfaces by reading input streams.
+// Import the 'readline' module for creating interactive command-line interfaces by 
+// reading input streams.
 const readline = require('readline');
 
-// Import the 'execSync' function from the 'child_process' module to execute shell commands synchronously.
+// Import the 'execSync' function from the 'child_process' module to execute shell 
+// commands synchronously.
 const { execSync } = require('child_process');
 
-// Import the 'path' module to work with file and directory paths in a platform-independent manner.
+// Import the 'path' module to work with file and directory paths in a 
+// platform-independent manner.
 const path = require('path');
 
-
-const LOGGING = (() => {
+/**
+ * Custom Logger Module
+ *
+ * This Immediately Invoked Function Expression (IIFE) serves as a custom logger for Node.js applications.
+ * It overrides the standard `console.log` function to write log entries to a designated directory.
+ * Additionally, it archives old logs and supports a debug mode.
+ */
+(() => {
 
 	// Directory for storing logs
 	const LOG_DIR = 'logs';
@@ -437,6 +447,12 @@ const getSettingValue = (settings, key) => {
  */
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+/**
+ * Checks if an object is empty and of the Object constructor.
+ *
+ * @param {Object} obj - The object to check.
+ * @returns {boolean} `true` if the object is empty and of the Object constructor, otherwise `false`.
+ */
 const isEmptyObject = (obj) => {
 	return Object.keys(obj).length === 0 && obj.constructor === Object;
 };
@@ -766,6 +782,14 @@ const processIdentifier = (identifier, database) => {
 	// Check if the device is already installed
 	const installedDevice = findInstalledSimulator(deviceName);
 	if (installedDevice) {
+
+		// Move the identifier to completed-list file
+		moveData(
+			identifier,
+			VARIABLES.targetSims,
+			VARIABLES.completedSims
+		);
+	
 		return {
 			udid: installedDevice.udid,
 			deviceName: installedDevice.name,
