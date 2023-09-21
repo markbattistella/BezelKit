@@ -5,17 +5,16 @@ const { existsSync, mkdirSync, renameSync, appendFile } = require("fs");
 // platform-independent manner.
 const path = require("path");
 
-// temporary handle for the VARIABLE const while refactoring
-const VARIABLES = { debug: true };
-
 /**
  * Custom Logger Module
  *
- * This Immediately Invoked Function Expression (IIFE) serves as a custom logger for Node.js applications.
+ * This function serves as a custom logger for Node.js applications.
  * It overrides the standard `console.log` function to write log entries to a designated directory.
  * Additionally, it archives old logs and supports a debug mode.
+ * 
+ * @param {Boolean} debug
  */
-(() => {
+module.exports = (debug) => {
   // Directory for storing logs
   const LOG_DIR = "logs";
 
@@ -42,7 +41,7 @@ const VARIABLES = { debug: true };
    */
   const customLogger = (...args) => {
     // Check if debug mode is enabled before logging
-    if (!VARIABLES.debug) return;
+    if (!debug) return;
 
     // Call the original console.log
     console._log(...args);
@@ -80,6 +79,5 @@ const VARIABLES = { debug: true };
 
   // Replace console.log with the custom logger
   console.log = customLogger;
-})();
+};
 
-module.exports = {};
