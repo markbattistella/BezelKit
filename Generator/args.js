@@ -1,11 +1,10 @@
+/**
+ * Parses command-line arguments into an object.
+ *
+ * @param {string[]} argv - Array of command-line arguments.
+ * @returns {Object} Parsed arguments as key-value pairs.
+ */
 module.exports = ((argv) => {
-
-	/**
-	 * Parses command-line arguments into an object.
-	 *
-	 * @param {string[]} argv - Array of command-line arguments.
-	 * @returns {Object} Parsed arguments as key-value pairs.
-	 */
 	const args = {};
 
 	// Iterate through command-line arguments starting from the third element
