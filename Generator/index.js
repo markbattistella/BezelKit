@@ -47,41 +47,11 @@ const VARIABLES = require("./config.js")(ARGS);
 // import our custom logger module
 require("./logger.js")(VARIABLES.debug);
 
-/**
- * Reads a file and returns a set of unique non-empty lines from it.
- *
- * @param {string} file - The path to the file to read.
- * @returns {Promise<Set<string>>} A Promise that resolves with a Set of unique non-empty lines from the file.
- */
-const getUniqueLinesFromFile = async (file) => {
-	try {
-		// Check if the file exists and is accessible
-		await fsp.access(file, fs.constants.F_OK);
+//import help handler
+const getHelpDialogue = require("./help.js");
 
-		// Create a read stream for the file
-		const fileStream = fs.createReadStream(file, 'utf8');
-
-		// Create a readline interface to read lines from the stream
-		const rl = readline.createInterface({ input: fileStream, crlfDelay: Infinity });
-
-		// Set to store unique non-empty lines
-		const uniqueLines = new Set();
-
-		// Iterate through each line and add non-empty lines to the set
-		for await (const line of rl) {
-			if (line.trim() !== '') {
-				uniqueLines.add(line);
-			}
-		}
-
-		return uniqueLines;
-	} catch (error) {
-		// Handle errors by displaying an error message and exiting the process
-		console.error(`[x] ERROR: issue with file: ${file}.`);
-		console.error(`    ↳ Message: ${error.message}`);
-		process.exit(1);
-	}
-};
+//import file utilities
+const { moveData, getUniqueLinesFromFile, sortFile } = require("./files.js");
 
 /**
  * Executes a shell command and returns its output.
@@ -154,95 +124,6 @@ const getInstalledRuntimes = () => {
 };
 
 /**
- * Appends a unique data item to a file if it doesn't already exist.
- *
- * @param {string} data - The data item to append.
- * @param {string} filePath - The path to the file.
- */
-const append = async (data, filePath) => {
-	try {
-		// Get unique lines from the file
-		const uniqueLines = await getUniqueLinesFromFile(filePath);
-
-		// Append the data item if it's not already present
-		if (!uniqueLines.has(data)) {
-			await fsp.appendFile(filePath, `\n${data}`, 'utf-8');
-			uniqueLines.add(data);
-		}
-	} catch (error) {
-		console.error(`[x] ERROR: appending data to file: ${data}`);
-		console.error(`    ↳ Message: ${error.message}`);
-	}
-};
-
-/**
- * Removes a data item from a file if it exists.
- *
- * @param {string} data - The data item to remove.
- * @param {string} filePath - The path to the file.
- */
-const remove = async (data, filePath) => {
-	try {
-		// Get unique lines from the file
-		const uniqueLines = await getUniqueLinesFromFile(filePath);
-
-		// Remove the data item if it exists
-		if (uniqueLines.has(data)) {
-			uniqueLines.delete(data);
-			const updatedContent = [...uniqueLines].join('\n');
-			await fsp.writeFile(filePath, updatedContent, 'utf-8');
-		}
-	} catch (error) {
-		console.error(`[x] ERROR: removing data from file: ${data}`);
-		console.error(`    ↳ Message: ${error.message}`);
-	}
-};
-
-/**
- * Moves a data item from one file to another.
- *
- * @param {string} data - The data item to move.
- * @param {string} fromFile - The source file path.
- * @param {string} toFile - The destination file path.
- */
-const moveData = async (data, fromFile, toFile) => {
-	// Append the data to the destination file and remove from the source file
-	await append(data, toFile);
-	await remove(data, fromFile);
-};
-
-/**
- * Asynchronously sorts the lines of a text file and writes the sorted content to a new file named 'sorted.txt'.
- * 
- * @param {string} filePath - The path to the text file that will be sorted.
- * @throws Will throw an error if reading from the file or writing to the file fails.
- */
-const sortFile = async (filePath) => {
-	try {
-		// Read the file into a string
-		const data = await fsp.readFile(filePath, 'utf8');
-
-		// Split the string into lines
-		const lines = data.split('\n');
-
-		// Sort the lines
-		const sortedLines = lines.sort();
-
-		// Join the sorted lines back into a string
-		const sortedData = sortedLines.join('\n');
-
-		// Write the sorted string back to a file
-		await fsp.writeFile(filePath, sortedData, 'utf8');
-
-		console.log('[i] INFO: File sorted successfully.');
-		console.log(`    ↳ ${filePath}`);
-	} catch (err) {
-		console.error('[x] Error: File sorting failed.');
-		console.error(`    ↳ ${filePath}`);
-	}
-};
-
-/**
  * Retrieves the value of a specific setting from a string of build settings.
  *
  * @param {string} settings - The build settings as a string.
@@ -273,14 +154,13 @@ const isEmptyObject = (obj) => {
 	return Object.keys(obj).length === 0 && obj.constructor === Object;
 };
 
-
 /**
  * Initializes the data extraction process.
  */
 const init = async () => {
 	try {
 		// See: #1
-		getHelpDialogue();
+		getHelpDialogue(ARGS);
 
 		// See: #2
 		const uniqueSimulatorIdentifiers = await getFilteredSimulators(
@@ -363,35 +243,6 @@ const init = async () => {
 	}
 };
 
-
-/**
- * 1. Displays a help message and exits the script if the help flag is provided.
- */
-const getHelpDialogue = () => {
-	if (ARGS.help || ARGS.h) {
-		console.log(
-			"---------------------------------------------------\n"    +
-			"--               BezelKit Generator              --\n"    +
-			"---------------------------------------------------\n"    +
-			"\n"                                                       +
-			"Usage: node index.js [options]\n\n"                       +
-			"Options:\n"                                               +
-			"  --deviceCsv\n\tThe CSV file with the Apple model and identifiers\n" +
-			"  --targetSims\n\tA text file with the identifiers you wish to get data from\n" +
-			"  --completedSims\n\tA text file of past, completed identifiers\n" +
-			"  --problematicSims\n\tA text file of error identifiers - either not found or error in creation or use\n" +
-			"  --projectPath\n\tPath to the Xcode project to fetch bezel sizes\n" +
-			"  --schemeName\n\tSceheme for the aboce Xcode project\n" +
-			"  --bundleID\n\tThe app bundle ID of the above project for easy install\n" +
-			"  --mergedOutputFilePath\n\tFile location to output local JSON file with data\n" +
-			"  --bezelKitResources\n\tThe JSON file used in the Package\n" +
-			"  --debug\n\tLog files to output or supress them\n" +
-			"  --help\n\tDisplay this screen\n\n" +
-			"Chances are you won't need to override any of these, but they're built in for growth or custom setups. Mainly would be good if you need use your own CSV file or custom list of device identifiers. Most beneficial section is the projectPath, schemeName, and bundleID where you can use that logic for your own app.\n\n"
-		);
-		process.exit(0);
-	}
-};
 
 /**
  * 2. Filters out completed and problematic simulators from the target simulators list.
