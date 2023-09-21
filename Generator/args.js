@@ -16,10 +16,13 @@ module.exports = ((argv) => {
 		// Remove leading dashes from the argument name
 		argName = argName.replace(/^-+/, '');
 
-		if (argValue) {
+		if (typeof argValue !== "undefined") {
 			// Convert argValue to a number if it's a numeric string, otherwise
 			// keep it as a string
-			argValue = isNaN(argValue) ? argValue : parseFloat(argValue);
+      argValue = isNaN(argValue) ? argValue : parseFloat(argValue);
+      if (argValue === "false") { //edge case where the arg is a boolean flag
+        argValue = false;
+      }
 		} else {
 			// If no value provided, consider it as a boolean flag
 			argValue = true;
