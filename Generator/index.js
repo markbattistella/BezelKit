@@ -41,116 +41,11 @@ const readline = require('readline');
 // commands synchronously.
 const { execSync } = require('child_process');
 
-const DEFAULTS = {
+const ARGS = require("./args.js");
+const VARIABLES = require("./config.js")(ARGS);
 
-	/**
-	 * The CSV file which contains all the device models and internal identifiers.
-	 * @type {string}
-	 */
-	deviceCsv: './Simulators/apple-device-database.csv',
-
-	/**
-	 * The file containing the list of target simulators from which to gather bezel data.
-	 * @type {string}
-	 */
-	targetSims: './Simulators/target-simulators.txt',
-
-	/**
-	 * The file containing the list of simulators from which bezel data has already been extracted.
-	 * This is used for filtering to prevent overloading the script's runtime.
-	 * @type {string}
-	 */
-	completedSims: './Simulators/completed-simulators.txt',
-
-	/**
-	 * The file containing the list of simulator identifiers that have no runtime installed,
-	 * but have not been run previously. Used to identify new devices without runtimes.
-	 * @type {string}
-	 */
-	problematicSims: './Simulators/problematic-simulators.txt',
-
-	/**
-	 * The path to the Xcode project used to extract bezel data.
-	 * @type {string}
-	 */
-	projectPath: './FetchBezel/FetchBezel.xcodeproj',
-
-	/**
-	 * The name of the Xcode scheme to use for extracting bezel data.
-	 * @type {string}
-	 */
-	schemeName: 'FetchBezel',
-
-	/**
-	 * The bundle identifier of the Xcode project where bezel data can be extracted.
-	 * @type {string}
-	 */
-	bundleID: 'com.mb.FetchBezel',
-
-	/**
-	 * The location to save the output merged JSON data for next run.
-	 * @type {string}
-	 */
-	mergedOutputFilePath: './cache.json',
-
-	/**
-	 * The location to save the output merged JSON data for use in the Package.
-	 * @type {string}
-	 */
-	bezelKitResources: '../Sources/BezelKit/Resources/bezel.min.json',
-
-	/**
-	 * Whether to generate a log file for reporting or not.
-	 * @type {boolean}
-	 */
-	debug: true
-};
-
-const ARGS = ((argv) => {
-
-	/**
-	 * Parses command-line arguments into an object.
-	 *
-	 * @param {string[]} argv - Array of command-line arguments.
-	 * @returns {Object} Parsed arguments as key-value pairs.
-	 */
-	const args = {};
-
-	// Iterate through command-line arguments starting from the third element
-	// (excluding 'node' and script filename)
-	for (const arg of argv.slice(2)) {
-		let [argName, argValue] = arg.split('=');
-
-		// Remove leading dashes from the argument name
-		argName = argName.replace(/^-+/, '');
-
-		if (argValue) {
-			// Convert argValue to a number if it's a numeric string, otherwise
-			// keep it as a string
-			argValue = isNaN(argValue) ? argValue : parseFloat(argValue);
-		} else {
-			// If no value provided, consider it as a boolean flag
-			argValue = true;
-		}
-
-		// Store the argument and its value in the args object
-		args[argName] = argValue;
-	}
-
-	return args;
-})(process.argv);
-
-
-/**
- * Assigns a value or a default value based on the condition.
- *
- * @param {*} value - The value to assign or evaluate.
- * @param {*} defaultValue - The default value to use if the condition is met.
- * @returns {*} The assigned value or the default value.
- */
-const assignOrDefault = (value, defaultValue) => (
-	value === undefined || value === true ? defaultValue : value
-);
+// import our custom logger module
+require("./logger.js")(VARIABLES.debug);
 
 /**
  * Reads a file and returns a set of unique non-empty lines from it.
@@ -971,27 +866,6 @@ const sortFiles = async (filePaths) => {
 		await sortFile(filePath);
 	}
 };
-
-
-/**
- * Generates a configuration object containing variable values.
- * Uses command line arguments or defaults if arguments are not provided.
- *
- * @param {Object} ARGS - Command line arguments.
- * @returns {Object} A configuration object with variable values.
- */
-const VARIABLES = ((ARGS) => ({
-	deviceCsv: assignOrDefault(ARGS.deviceCsv, DEFAULTS.deviceCsv),
-	targetSims: assignOrDefault(ARGS.targetSims, DEFAULTS.targetSims),
-	completedSims: assignOrDefault(ARGS.completedSims, DEFAULTS.completedSims),
-	problematicSims: assignOrDefault(ARGS.problematicSims, DEFAULTS.problematicSims),
-	projectPath: assignOrDefault(ARGS.projectPath, DEFAULTS.projectPath),
-	schemeName: assignOrDefault(ARGS.schemeName, DEFAULTS.schemeName),
-	bundleID: assignOrDefault(ARGS.bundleID, DEFAULTS.bundleID),
-	mergedOutputFilePath: assignOrDefault(ARGS.mergedOutputFilePath, DEFAULTS.mergedOutputFilePath),
-	bezelKitResources: assignOrDefault(ARGS.bezelKitResources, DEFAULTS.bezelKitResources),
-	debug: assignOrDefault(ARGS.debug, DEFAULTS.debug)
-}))(ARGS);
 
 // MARK: - Initialize the script
 init();
