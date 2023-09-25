@@ -1,10 +1,7 @@
 .DS_Store
-/.build
-/Packages
-/*.xcodeproj
-xcuserdata/
-DerivedData/
 .swiftpm
-.netrc
-logs
+.swiftpm/*
+.vscode
 .markdownlint.json
+.build
+logs
