@@ -53,10 +53,6 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPhone 14 Plus | `iPhone14,8` | `53.33` |
 | iPhone 14 Pro | `iPhone15,2` | `55` |
 | iPhone 14 Pro Max | `iPhone15,3` | `55` |
-| iPhone 15 | `iPhone15,4` | `55` |
-| iPhone 15 Plus | `iPhone15,5` | `55` |
-| iPhone 15 Pro | `iPhone16,1` | `55` |
-| iPhone 15 Pro Max | `iPhone16,2` | `55` |
 | iPhone SE (1st generation) | `iPhone8,4` | `0` |
 | iPhone SE (2nd generation) | `iPhone12,8` | `0` |
 | iPhone SE (3rd generation) | `iPhone14,6` | `0` |
@@ -98,8 +94,3 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPad Pro (12.9-inch) (4th generation) | `iPad8,11`, `iPad8,12` | `18` |
 | iPad Pro (12.9-inch) (5th generation) | `iPad13,8`, `iPad13,9`, `iPad13,10`, `iPad13,11` | `18` |
 | iPad Pro (12.9-inch) (6th generation) | `iPad14,5`, `iPad14,6` | `18` |
-
-## Watch
-
-| Device                      | Model Identifier | Bezel Size |
-|-----------------------------|------------------|------------|

@@ -14,7 +14,7 @@
 
 ## Overview
 
-BezelKit is a Swift package designed to simplify the process of accessing device-specific bezel sizes in apps.
+**BezelKit** is a Swift package designed to simplify the process of accessing device-specific bezel sizes in apps.
 
 Knowing the exact bezel size can be crucial for aligning UI elements, creating immersive experiences, or when you need pixel-perfect design layouts.
 
@@ -120,8 +120,10 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
     // Sets a fallback value of 10.0 and enables zero-check
     CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
+    
     return true
   }
 }
@@ -140,23 +142,18 @@ struct YourApp: App {
     WindowGroup {
       ContentView()
         .onAppear() {
+
           // Sets a fallback value of 10.0 and enables zero-check
           CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
         }
     }
   }
 }
-
-struct ContentView: View {
-  var body: some View {
-    Text("Hello, SwiftUI!")
-  }
-}
 ```
 
 #### Note
 
-You only need to call `setFallbackDeviceBezel(_:ifZero:)` once. Doing this as early as possible ensures the fallback setting is applied throughout your application.
+You only need to call `setFallbackDeviceBezel(_:ifZero:)` **once**. Doing this as early as possible ensures the fallback setting is applied throughout your application.
 
 ### Effects of Setting a Fallback
 
@@ -178,6 +175,67 @@ let currentBezel = CGFloat.deviceBezel
 print("Current device bezel: \(currentBezel)")
 
 // Output will be 0.0 if the device is not in the JSON data
+```
+
+### Handling Errors with BezelKit
+
+BezelKit offers optional error handling to manage unexpected issues like missing device bezel data or data parsing problems.
+
+By using BezelKit's error callback, developers are alerted of these hiccups, allowing them to handle them as they see fit, whether it's logging for debugging or user notifications.
+
+This ensures a smoother and more resilient app experience.
+
+#### SwiftUI: Error handling
+
+```swift
+import SwiftUI
+import BezelKit
+
+struct ContentView: View {
+  @State private var showErrorAlert: Bool = false
+  @State private var errorMessage: String = ""
+
+  var body: some View {
+    RoundedRectangle(cornerRadius: .deviceBezel)
+      .stroke(Color.green, lineWidth: 20)
+      .ignoresSafeArea()
+      .alert(isPresented: $showErrorAlert) {
+        Alert(title: Text("Error"),
+              message: Text(errorMessage),
+              dismissButton: .default(Text("Got it!")))
+      }
+      .onAppear {
+          DeviceBezel.errorCallback = { error in
+            errorMessage = error.localizedDescription
+            showErrorAlert = true
+          }
+      }
+    }
+}
+```
+
+#### UIKit: Error handling
+
+```swift
+import UIKit
+import BezelKit
+
+class ViewController: UIViewController {
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    DeviceBezel.errorCallback = { [weak self] error in
+      let alert = UIAlertController(title: "Error",
+                                    message: error.localizedDescription,
+                                    preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+      self?.present(alert, animated: true, completion: nil)
+    }
+        
+    let bezelValue = CGFloat.deviceBezel
+    // Use bezelValue for your views
+  }
+}
 ```
 
 ## Comparison
@@ -210,7 +268,7 @@ import BezelKit
 
 struct ContentView: View {
   var body: some View {
-    RoundedRectangle(cornerRadius: .BezelKit)
+    RoundedRectangle(cornerRadius: .deviceBezel)
       .stroke(.green, lineWidth: 20)
       .ignoresSafeArea()
   }
@@ -223,19 +281,19 @@ As you can see, with no `setFallbackBezelKit` set, the iPhone SE (3rd generation
 
 ## Things to note
 
-`BezelKit` **does not** currently support the affects from display zooming. When the generator runs, it perfoms all extractions on the "Standard" zoom level of the device.
+`BezelKit` **does not** currently support the affects from display zooming. When the generator runs, it performs all extractions on the "Standard" zoom level of the device.
 
 If this was run on the "Zoomed" level, then the bezel radius would be different. However, since the physical device cannot change based on the zoom level, using "Standard" is the correct CGFloat number.
 
-There is also no way to automate zoom levels in `xcrun simctl` so it would have to be a manual inclusion, and at this point in time (unless raised via Issues) there is no realy benefit for using the zoomed value for `_displayRoundedCorner`.
+There is also no way to automate zoom levels in `xcrun simctl` so it would have to be a manual inclusion, and at this point in time (unless raised via Issues) there is no really benefit for using the zoomed value for `_displayRoundedCorner`.
 
 ## Generating New Bezels
 
-You can generate new bezel data for additional devices using the `index.js` NodeJS script located in the `Sources/Generator` folder.
+You can generate new bezel data for additional devices using the `index.js` NodeJS script located in the `Generator` folder.
 
 ### Requirements
 
-- iOS/iPadOS runtime installed on your Mac machine to get the simulator.
+- iOS/iPadOS runtime installed on your macOS machine to get the simulator.
 - NodeJS installed to run the script.
 - All requirements for running a simulator, opening an Xcode project, etc.
 
@@ -243,18 +301,32 @@ You can generate new bezel data for additional devices using the `index.js` Node
 
 ### Steps
 
-1. **CSV File**: The script reads from a CSV file that contains Apple device identifiers (like `iPhone1,1`) and their friendly names (like "iPhone 1").
+All devices (pending, problematic, and completed) are stored within the `apple-device-database.json` file.
 
-2. **Target Simulators**: The script uses the `target-simulators.txt` file to decide which simulators to boot and fetch bezel sizes from.
+The file is sectioned into a few areas:
+
+1. **devices**: These are the completed, and computed device identifiers and their names and bezel size. This is broken into three categories - `iPad`, `iPhone`, and `iPod`.
+
+2. **pending**: The script uses the `pending` objects to decide which simulators to boot and fetch bezel sizes from. They are to be inserted as:
+
+    ```json
+    "pending" : {
+      "identifier" : { "name" : "Simulator name" }
+    }
+
+    "pending" : {
+      "iPhone16,2" : { "name" : "iPhone 15 Pro Max" }
+    }
+    ```
 
 3. **Success & Failure**:
-   - If it succeeds, the simulator ID is moved to the `completed-simulators.txt` file.
-   - If it fails, the simulator ID is moved to the `problematic-simulators.txt` file.
+   - If the simulator lookup **succeeds**, the simulator data is moved to the `devices` object.
+   - If the simulator lookup **fails**, the simulator identifier and object data is moved to the `problematic` object.
 
-To run the script:
+#### Running the script
 
 ```bash
-cd Sources/Generator
+cd ./Generator
 node index.js
 ```
 
@@ -262,13 +334,21 @@ node index.js
 
 If you'd like to update or extend the list of device bezel sizes, you can easily do so by:
 
-1. **Adding to CSV**: Add more devices and their identifiers to the existing CSV file. Make sure the friendly names in the CSV match the "Device Type" from the `Create New Simulator` screen in Xcode.
+1. **Adding to `pending` object**: Add more devices and their identifiers to the existing JSON file. Make sure the friendly names in the JSON match the "Device Type" from the `Create New Simulator` screen in Xcode.
 
    ![Add New Simulator](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/simulator.jpg)
 
-2. **Problematic Simulators**: If any simulators are listed in the `problematic-simulators.txt`, you can move them back to `target-simulators.txt` and attempt to run the script again to see if the issue is resolved.
+    ```json
+    "pending" : {
+      "iPhone8,1" : { "name" : "iPhone 6s" }
+    }
+    ```
+
+2. **Problematic Simulators**: If any simulators are listed under the `problematic` key, they are automatically moved into pending the next time the script is run.
 
 By following these steps, you can continually update and maintain the device bezel data.
+
+Once the script completes and updates the `bezel.min.json` for the actual package, `pending` and `problematic` keys are deleted, and the JSON is minified.
 
 ## Contributing
 

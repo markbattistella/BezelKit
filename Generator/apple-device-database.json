@@ -1,0 +1,489 @@
+{
+  "_metadata": {
+    "Author": "Mark Battistella",
+    "Project": "BezelKit - BezelGenerator",
+    "Website": "https://markbattistella.com"
+  },
+  "devices": {
+    "iPad": {
+      "iPad1,1": {
+        "bezel": 0,
+        "name": "iPad"
+      },
+      "iPad2,1": {
+        "bezel": 0,
+        "name": "iPad 2"
+      },
+      "iPad2,2": {
+        "bezel": 0,
+        "name": "iPad 2"
+      },
+      "iPad2,3": {
+        "bezel": 0,
+        "name": "iPad 2"
+      },
+      "iPad2,4": {
+        "bezel": 0,
+        "name": "iPad 2"
+      },
+      "iPad2,5": {
+        "bezel": 0,
+        "name": "iPad mini"
+      },
+      "iPad2,6": {
+        "bezel": 0,
+        "name": "iPad mini"
+      },
+      "iPad2,7": {
+        "bezel": 0,
+        "name": "iPad mini"
+      },
+      "iPad3,1": {
+        "bezel": 0,
+        "name": "iPad (3rd generation)"
+      },
+      "iPad3,2": {
+        "bezel": 0,
+        "name": "iPad (3rd generation)"
+      },
+      "iPad3,3": {
+        "bezel": 0,
+        "name": "iPad (3rd generation)"
+      },
+      "iPad3,4": {
+        "bezel": 0,
+        "name": "iPad (4th generation)"
+      },
+      "iPad3,5": {
+        "bezel": 0,
+        "name": "iPad (4th generation)"
+      },
+      "iPad3,6": {
+        "bezel": 0,
+        "name": "iPad (4th generation)"
+      },
+      "iPad4,1": {
+        "bezel": 0,
+        "name": "iPad Air"
+      },
+      "iPad4,2": {
+        "bezel": 0,
+        "name": "iPad Air"
+      },
+      "iPad4,3": {
+        "bezel": 0,
+        "name": "iPad Air"
+      },
+      "iPad4,4": {
+        "bezel": 0,
+        "name": "iPad mini 2"
+      },
+      "iPad4,5": {
+        "bezel": 0,
+        "name": "iPad mini 2"
+      },
+      "iPad4,6": {
+        "bezel": 0,
+        "name": "iPad mini 2"
+      },
+      "iPad4,7": {
+        "bezel": 0,
+        "name": "iPad mini 3"
+      },
+      "iPad4,8": {
+        "bezel": 0,
+        "name": "iPad mini 3"
+      },
+      "iPad4,9": {
+        "bezel": 0,
+        "name": "iPad mini 3"
+      },
+      "iPad5,1": {
+        "bezel": 0,
+        "name": "iPad mini 4"
+      },
+      "iPad5,2": {
+        "bezel": 0,
+        "name": "iPad mini 4"
+      },
+      "iPad5,3": {
+        "bezel": 0,
+        "name": "iPad Air 2"
+      },
+      "iPad5,4": {
+        "bezel": 0,
+        "name": "iPad Air 2"
+      },
+      "iPad6,11": {
+        "bezel": 0,
+        "name": "iPad (5th generation)"
+      },
+      "iPad6,12": {
+        "bezel": 0,
+        "name": "iPad (5th generation)"
+      },
+      "iPad6,3": {
+        "bezel": 0,
+        "name": "iPad Pro (9.7-inch)"
+      },
+      "iPad6,4": {
+        "bezel": 0,
+        "name": "iPad Pro (9.7-inch)"
+      },
+      "iPad7,1": {
+        "bezel": 0,
+        "name": "iPad Pro (12.9-inch) (2nd generation)"
+      },
+      "iPad7,11": {
+        "bezel": 0,
+        "name": "iPad (7th generation)"
+      },
+      "iPad7,12": {
+        "bezel": 0,
+        "name": "iPad (7th generation)"
+      },
+      "iPad7,2": {
+        "bezel": 0,
+        "name": "iPad Pro (12.9-inch) (2nd generation)"
+      },
+      "iPad7,3": {
+        "bezel": 0,
+        "name": "iPad Pro (10.5-inch)"
+      },
+      "iPad7,4": {
+        "bezel": 0,
+        "name": "iPad Pro (10.5-inch)"
+      },
+      "iPad7,5": {
+        "bezel": 0,
+        "name": "iPad (6th generation)"
+      },
+      "iPad7,6": {
+        "bezel": 0,
+        "name": "iPad (6th generation)"
+      },
+      "iPad11,1": {
+        "bezel": 0,
+        "name": "iPad mini (5th generation)"
+      },
+      "iPad11,2": {
+        "bezel": 0,
+        "name": "iPad mini (5th generation)"
+      },
+      "iPad11,3": {
+        "bezel": 0,
+        "name": "iPad Air (3rd generation)"
+      },
+      "iPad11,4": {
+        "bezel": 0,
+        "name": "iPad Air (3rd generation)"
+      },
+      "iPad11,6": {
+        "bezel": 0,
+        "name": "iPad (8th generation)"
+      },
+      "iPad11,7": {
+        "bezel": 0,
+        "name": "iPad (8th generation)"
+      },
+      "iPad12,1": {
+        "bezel": 0,
+        "name": "iPad (9th generation)"
+      },
+      "iPad12,2": {
+        "bezel": 0,
+        "name": "iPad (9th generation)"
+      },
+      "iPad13,1": {
+        "bezel": 18,
+        "name": "iPad Air (4th generation)"
+      },
+      "iPad13,10": {
+        "bezel": 18,
+        "name": "iPad Pro (12.9-inch) (5th generation)"
+      },
+      "iPad13,11": {
+        "bezel": 18,
+        "name": "iPad Pro (12.9-inch) (5th generation)"
+      },
+      "iPad13,12": {
+        "bezel": 18,
+        "name": "iPad mini (6th generation)"
+      },
+      "iPad13,2": {
+        "bezel": 18,
+        "name": "iPad Air (4th generation)"
+      },
+      "iPad13,4": {
+        "bezel": 18,
+        "name": "iPad Pro (11-inch) (3rd generation)"
+      },
+      "iPad13,5": {
+        "bezel": 18,
+        "name": "iPad Pro (11-inch) (3rd generation)"
+      },
+      "iPad13,6": {
+        "bezel": 18,
+        "name": "iPad Pro (11-inch) (3rd generation)"
+      },
+      "iPad13,7": {
+        "bezel": 18,
+        "name": "iPad Pro (11-inch) (3rd generation)"
+      },
+      "iPad13,8": {
+        "bezel": 18,
+        "name": "iPad Pro (12.9-inch) (5th generation)"
+      },
+      "iPad13,9": {
+        "bezel": 18,
+        "name": "iPad Pro (12.9-inch) (5th generation)"
+      }
+    },
+    "iPhone": {
+      "iPhone1,1": {
+        "bezel": 0,
+        "name": "iPhone"
+      },
+      "iPhone1,2": {
+        "bezel": 0,
+        "name": "iPhone 3G"
+      },
+      "iPhone2,1": {
+        "bezel": 0,
+        "name": "iPhone 3GS"
+      },
+      "iPhone3,1": {
+        "bezel": 0,
+        "name": "iPhone 4"
+      },
+      "iPhone3,2": {
+        "bezel": 0,
+        "name": "iPhone 4"
+      },
+      "iPhone3,3": {
+        "bezel": 0,
+        "name": "iPhone 4"
+      },
+      "iPhone4,1": {
+        "bezel": 0,
+        "name": "iPhone 4S"
+      },
+      "iPhone5,1": {
+        "bezel": 0,
+        "name": "iPhone 5"
+      },
+      "iPhone5,2": {
+        "bezel": 0,
+        "name": "iPhone 5"
+      },
+      "iPhone5,3": {
+        "bezel": 0,
+        "name": "iPhone 5c"
+      },
+      "iPhone5,4": {
+        "bezel": 0,
+        "name": "iPhone 5c"
+      },
+      "iPhone6,1": {
+        "bezel": 0,
+        "name": "iPhone 5s"
+      },
+      "iPhone6,2": {
+        "bezel": 0,
+        "name": "iPhone 5s"
+      },
+      "iPhone7,1": {
+        "bezel": 0,
+        "name": "iPhone 6 Plus"
+      },
+      "iPhone7,2": {
+        "bezel": 0,
+        "name": "iPhone 6"
+      },
+      "iPhone8,1": {
+        "bezel": 0,
+        "name": "iPhone 6s"
+      },
+      "iPhone8,2": {
+        "bezel": 0,
+        "name": "iPhone 6s Plus"
+      },
+      "iPhone8,4": {
+        "bezel": 0,
+        "name": "iPhone SE (1st generation)"
+      },
+      "iPhone9,1": {
+        "bezel": 0,
+        "name": "iPhone 7"
+      },
+      "iPhone9,2": {
+        "bezel": 0,
+        "name": "iPhone 7 Plus"
+      },
+      "iPhone9,3": {
+        "bezel": 0,
+        "name": "iPhone 7"
+      },
+      "iPhone9,4": {
+        "bezel": 0,
+        "name": "iPhone 7 Plus"
+      },
+      "iPhone10,1": {
+        "bezel": 0,
+        "name": "iPhone 8"
+      },
+      "iPhone10,2": {
+        "bezel": 0,
+        "name": "iPhone 8 Plus"
+      },
+      "iPhone10,3": {
+        "bezel": 39,
+        "name": "iPhone X"
+      },
+      "iPhone10,4": {
+        "bezel": 0,
+        "name": "iPhone 8"
+      },
+      "iPhone10,5": {
+        "bezel": 0,
+        "name": "iPhone 8 Plus"
+      },
+      "iPhone10,6": {
+        "bezel": 39,
+        "name": "iPhone X"
+      },
+      "iPhone11,2": {
+        "bezel": 39,
+        "name": "iPhone Xs"
+      },
+      "iPhone11,4": {
+        "bezel": 39,
+        "name": "iPhone Xs Max"
+      },
+      "iPhone11,6": {
+        "bezel": 39,
+        "name": "iPhone Xs Max"
+      },
+      "iPhone11,8": {
+        "bezel": 41.5,
+        "name": "iPhone Xʀ"
+      },
+      "iPhone12,1": {
+        "bezel": 41.5,
+        "name": "iPhone 11"
+      },
+      "iPhone12,3": {
+        "bezel": 39,
+        "name": "iPhone 11 Pro"
+      },
+      "iPhone12,5": {
+        "bezel": 39,
+        "name": "iPhone 11 Pro Max"
+      },
+      "iPhone12,8": {
+        "bezel": 0,
+        "name": "iPhone SE (2nd generation)"
+      },
+      "iPhone13,1": {
+        "bezel": 44,
+        "name": "iPhone 12 mini"
+      },
+      "iPhone13,2": {
+        "bezel": 47.33,
+        "name": "iPhone 12"
+      },
+      "iPhone13,3": {
+        "bezel": 47.33,
+        "name": "iPhone 12 Pro"
+      },
+      "iPhone13,4": {
+        "bezel": 53.33,
+        "name": "iPhone 12 Pro Max"
+      },
+      "iPhone14,2": {
+        "bezel": 47.33,
+        "name": "iPhone 13 Pro"
+      },
+      "iPhone14,3": {
+        "bezel": 53.33,
+        "name": "iPhone 13 Pro Max"
+      },
+      "iPhone14,4": {
+        "bezel": 44,
+        "name": "iPhone 13 mini"
+      },
+      "iPhone14,5": {
+        "bezel": 47.33,
+        "name": "iPhone 13"
+      },
+      "iPhone14,6": {
+        "bezel": 0,
+        "name": "iPhone SE (3rd generation)"
+      },
+      "iPhone14,7": {
+        "bezel": 47.33,
+        "name": "iPhone 14"
+      },
+      "iPhone14,8": {
+        "bezel": 53.33,
+        "name": "iPhone 14 Plus"
+      },
+      "iPhone15,2": {
+        "bezel": 55,
+        "name": "iPhone 14 Pro"
+      },
+      "iPhone15,3": {
+        "bezel": 55,
+        "name": "iPhone 14 Pro Max"
+      },
+      "iPhone15,4": {
+        "bezel": 55,
+        "name": "iPhone 15"
+      },
+      "iPhone15,5": {
+        "bezel": 55,
+        "name": "iPhone 15 Plus"
+      },
+      "iPhone16,1": {
+        "bezel": 55,
+        "name": "iPhone 15 Pro"
+      },
+      "iPhone16,2": {
+        "bezel": 55,
+        "name": "iPhone 15 Pro Max"
+      }
+    },
+    "iPod": {
+      "iPod1,1": {
+        "bezel": 0,
+        "name": "iPod touch (1st generation)"
+      },
+      "iPod2,1": {
+        "bezel": 0,
+        "name": "iPod touch (2nd generation)"
+      },
+      "iPod3,1": {
+        "bezel": 0,
+        "name": "iPod touch (3rd generation)"
+      },
+      "iPod4,1": {
+        "bezel": 0,
+        "name": "iPod touch (4th generation)"
+      },
+      "iPod5,1": {
+        "bezel": 0,
+        "name": "iPod touch (5th generation)"
+      },
+      "iPod7,1": {
+        "bezel": 0,
+        "name": "iPod touch (6th generation)"
+      },
+      "iPod9,1": {
+        "bezel": 0,
+        "name": "iPod touch (7th generation)"
+      }
+    }
+  },
+  "pending": {},
+  "problematic": {}
+}

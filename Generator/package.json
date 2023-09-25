@@ -1,0 +1,23 @@
+{
+    "name": "bezel-extractor",
+    "version": "1.0.0",
+    "description": "A simple project to install iOS and iPadOS simulators, run an Xcode project to extract bezel data, and merge it into a single JSON file.",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/markbattistella/bezelkit-extractor/"
+    },
+    "author": "Mark Battistella",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/markbattistella/bezelkit-extractor/issues/"
+    },
+    "homepage": "https://github.com/markbattistella/bezelkit-extractor/",
+    "keywords": [],
+    "type": "module",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+}
