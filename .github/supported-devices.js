@@ -1,10 +1,10 @@
 /*
  * Generate Supported Devices markdown file
  * -----------------------
- * This script reads the bezel-data-min.json file and generates a markdown file
+ * This script reads the bezel.min.json file and generates a markdown file
  *
  * Author: Mark Battistella
- * Version: 1.0.0
+ * Version: 2.0.0
  * Licence: MIT
  * Contact: @markbattistella
  * Website: https://markbattistella.com
@@ -20,31 +20,32 @@ const fs = require('fs');
  * @return {string} The Markdown-formatted string.
  */
 const jsonToMarkdown = (data) => {
-  // Initialize Markdown header
   let markdown = '# Supported Device List\n\n';
   markdown += 'Below is the current supported list of devices `BezelKit` can return data for.\n\n';
 
-  // Loop through each category (like 'iPod Touch', 'iPhone', etc.)
-  for (const category in data) {
-    // Add Markdown sub-header for each category
+  const devices = data.devices;
+
+  for (const category in devices) {
     markdown += `## ${category}\n\n`;
 
-    // Define the Markdown table header
-    markdown += '| Device                      | Model Identifier | Bezel Size |\n';
-    markdown += '|-----------------------------|------------------|------------|\n';
-    
-    // Populate the table with device data
-    for (const item of data[category]) {
-      // Map each identifier with backticks and join them with a comma and space
-      const identifiers = item.identifiers.map(id => `\`${id}\``).join(', ');
-      markdown += `| ${item.device} | ${identifiers} | \`${item.bezel}\` |\n`;
+    markdown += '| Device                      | Model Identifier       | Bezel Size |\n';
+    markdown += '|-----------------------------|------------------------|------------|\n';
+
+    const categoryDevices = devices[category];
+    for (const modelId in categoryDevices) {
+      const deviceDetails = categoryDevices[modelId];
+      markdown += `| ${deviceDetails.name} | \`${modelId}\` | \`${deviceDetails.bezel}\` |\n`;
     }
 
-    // Add a newline to separate categories
     markdown += '\n';
   }
 
-  // Remove trailing whitespace and add a single newline at the end
+  // Add _metadata information at the bottom
+  const meta = data._metadata;
+  markdown += '---\n'; // Horizontal line for separation
+  markdown += `**Author**: [${meta.Author}](${meta.Website})\n`;
+  markdown += `**Project**: ${meta.Project}\n`;
+
   return markdown.trim() + '\n';
 };
 
@@ -53,8 +54,8 @@ const jsonToMarkdown = (data) => {
  */
 const main = () => {
   // Read JSON data from file
-  const jsonStr = fs.readFileSync('./Sources/BezelKit/Resources/bezel-data-min.json', 'utf-8');
-  
+  const jsonStr = fs.readFileSync('./Sources/BezelKit/Resources/bezel.min.json', 'utf-8');
+
   // Parse the JSON string to an object
   const jsonData = JSON.parse(jsonStr);
 

@@ -1,158 +1,99 @@
 //
-//  BezelKit
-//  Created by Mark Battistella
+// Project: BezelKit
+// Author: Mark Battistella
+// Website: https://markbattistella.com
 //
 
 import UIKit
 
-/// A utility class for fetching device-specific bezel sizes.
+/// `DeviceBezel` provides a mechanism to obtain the bezel radius of the current device.
 public class DeviceBezel {
 
-	/// A cache for device bezel sizes, using device identifiers as keys.
-	private static var deviceCache: [String: CGFloat] = [:]
+	/// An enumeration of errors that can occur when attempting to obtain a device's bezel thickness.
+	public enum DeviceBezelError: Error {
 
-	/// Stores all device information after the initial load.
-	private static var allDevices: AllDevices?
+		/// The resource needed to fetch bezel data could not be located.
+		case resourceNotFound
 
-	/// Enum to categorise different types of devices.
-	private enum DeviceCategory: String, CaseIterable {
-		case iPod, iPhone, iPad, Watch
+		/// An error occurred when parsing the bezel data.
+		/// - Parameters:
+		///   - String: A description of the parsing error.
+		case dataParsingFailed(String)
 	}
 
-	/// Struct to represent each device type.
-	private struct DeviceType: Decodable {
-		let device: String
-		let identifiers: [String]
-		let bezel: CGFloat
-	}
+	/// Cache to hold parsed device information.
+	private static var devices: Devices?
 
-	/// Struct to represent all devices, categorized by type.
-	private struct AllDevices: Decodable {
-		let iPod: [DeviceType]
-		let iPhone: [DeviceType]
-		let iPad: [DeviceType]
-		let Watch: [DeviceType]
-	}
+	/// A cache mapping device identifiers to their respective bezel thicknesses.
+	private static var cache: [String: CGFloat] = [:]
 
-	/// Loads and caches device information from the embedded JSON file.
-	/// Throws an error if the JSON file cannot be loaded or decoded.
+	/// A callback to be invoked when an error occurs during bezel data fetching or processing.
+	public static var errorCallback: ((DeviceBezelError) -> Void)?
+
+	/// Loads device data from the JSON resource, decoding and caching the relevant information.
+	///
+	/// - Throws: An error of type `DeviceBezelError` if there's an issue accessing or decoding the data.
 	private static func loadDeviceData() throws {
-
-		// Attempt to find the URL of the JSON file in the module bundle.
-		guard let url = Bundle.module.url(forResource: "bezel-data-min", withExtension: "json") else {
-			throw NSError(domain: "ResourceNotFound", code: 404, userInfo: nil)
+		guard let url = Bundle.module.url(
+			forResource: "bezel",
+			withExtension: "min.json"
+		) else {
+			throw DeviceBezelError.resourceNotFound
 		}
+
 		let data = try Data(contentsOf: url)
-		let decodedData = try JSONDecoder().decode(AllDevices.self, from: data)
-		allDevices = decodedData
-		cacheDevices(from: decodedData)
+		let decodedData = try JSONDecoder().decode(Database.self, from: data)
+		self.devices = decodedData.devices
+		cacheDevices(from: decodedData.devices)
 	}
 
-	/// Caches the bezel sizes of devices for quicker future access.
+	/// Caches bezel radius data for various device types: iPad, iPhone, and iPod.
 	///
-	/// - Parameter data: The `AllDevices` instance containing all device information.
-	private static func cacheDevices(from data: AllDevices) {
-		for category in DeviceCategory.allCases {
-			let deviceTypes: [DeviceType]
-			switch category {
-				case .iPod:
-					deviceTypes = data.iPod
-				case .iPhone:
-					deviceTypes = data.iPhone
-				case .iPad:
-					deviceTypes = data.iPad
-				case .Watch:
-					deviceTypes = data.Watch
-			}
+	/// - Parameters:
+	///   - devices: The `Devices` struct containing bezel information for different device types.
+	private static func cacheDevices(from devices: Devices) {
+		cacheDeviceType(devices.iPad)
+		cacheDeviceType(devices.iPhone)
+		cacheDeviceType(devices.iPod)
+	}
 
-			for deviceType in deviceTypes {
-				deviceType.identifiers.forEach { identifier in
-					deviceCache[identifier] = deviceType.bezel
-				}
-			}
+	/// Helper function that populates the cache with bezel radius for a specific device type.
+	///
+	/// - Parameters:
+	///   - deviceType: A dictionary mapping device identifiers to their respective `DeviceInfo`.
+	private static func cacheDeviceType(_ deviceType: [String: DeviceInfo]) {
+		for (identifier, deviceInfo) in deviceType {
+			cache[identifier] = CGFloat(deviceInfo.bezel)
 		}
 	}
+}
 
-	/// Fetches the bezel size for the current device.
+extension DeviceBezel {
+
+	/// Provides the bezel thickness for the current device.
 	///
-	/// This method will load and cache device data from a JSON file if it hasn't been loaded yet.
-	/// If the device's bezel size is not found, this method returns `nil`.
+	/// If the data hasn't been loaded yet, this property will attempt to load it. If any errors occur during the loading or
+	/// processing, the registered error callback (if any) will be invoked.
 	///
-	/// - Returns: The bezel size of the current device as `CGFloat` or `nil` if not found.
+	/// - Returns: An optional `CGFloat` representing the bezel thickness for the current device.
+	/// Returns `nil` if the information isn't available or an error occurred.
 	public static var currentBezel: CGFloat? {
-
-		// Load device data if it hasn't been loaded yet.
-		if allDevices == nil {
+		if devices == nil {
 			do {
 				try loadDeviceData()
+			} catch let error as DeviceBezelError {
+				errorCallback?(error)
+				return nil
+			} catch let error as DecodingError {
+				errorCallback?(handleDecodingError(error))
+				return nil
 			} catch {
-				print("Failed to load device data: \(error)")
+				errorCallback?(.dataParsingFailed(error.localizedDescription))
 				return nil
 			}
 		}
 
-		// Fetch the model identifier of the current device.
 		let identifier = UIDevice.current.modelIdentifier
-
-		// Look up the bezel size for the current device in the cache.
-		return deviceCache[identifier]
-	}
-}
-
-/// `UIDevice` extension to add a `modelIdentifier` property.
-private extension UIDevice {
-
-	/// The model name identifier of the device.
-	///
-	/// For real devices, this identifier is obtained by calling `uname()` function.
-	/// For simulators, the identifier is read from the environment variable `SIMULATOR_MODEL_IDENTIFIER`.
-	///
-	/// - Returns: A `String` representing the model name identifier of the device.
-	var modelIdentifier: String {
-		#if targetEnvironment(simulator)
-			return ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? ""
-		#else
-			var systemInfo = utsname()
-			uname(&systemInfo)
-			let machineMirror = Mirror(reflecting: systemInfo.machine)
-			return machineMirror.children.compactMap {
-				$0.value as? Int8
-			}.filter {
-				$0 != 0
-			}.map {
-				String(UnicodeScalar(UInt8($0)))
-			}.joined()
-		#endif
-	}
-}
-
-/// `CGFloat` extension for accessing device-specific bezel sizes.
-public extension CGFloat {
-
-	// Fallback value if bezel size is unavailable.
-	private static var fallbackBezelValue: CGFloat = 0.0
-
-	// Flag to determine if zero should be considered as a fallback condition.
-	private static var shouldFallbackIfZero: Bool = false
-
-	/// Returns the bezel size for the current device, or the fallback value if unavailable or zero.
-	///
-	/// - Returns: A `CGFloat` representing the bezel size or the fallback value.
-	static var deviceBezel: CGFloat {
-		if let currentBezel = DeviceBezel.currentBezel,
-		   !(shouldFallbackIfZero && currentBezel == 0.0) {
-			return currentBezel
-		}
-		return fallbackBezelValue
-	}
-
-	/// Sets a fallback value to be used when the bezel size for the current device is unavailable or zero.
-	///
-	/// - Parameters:
-	///   - value: The fallback `CGFloat` value to be used.
-	///   - zero: A `Bool` flag to determine if a zero value should trigger the fallback.
-	static func setFallbackDeviceBezel(_ value: CGFloat, ifZero zero: Bool = false) {
-		fallbackBezelValue = value
-		shouldFallbackIfZero = zero
+		return cache[identifier]
 	}
 }
