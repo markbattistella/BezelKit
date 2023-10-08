@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.0.1
+
+### What's Changed
+
+- 2023-10-08 - removed the "Generator" from repo, and moved it into its own repo [#28](https://github.com/markbattistella/BezelKit/issues/28)
+
 ## 2.0.0
 
 ### What's Changed
