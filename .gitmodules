@@ -1,0 +1,3 @@
+[submodule "Generator"]
+	path = Generator
+	url = https://github.com/markbattistella/BezelKit-Generator
