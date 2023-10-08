@@ -1,7 +1,5 @@
 .DS_Store
 .swiftpm
-.swiftpm/*
 .vscode
 .markdownlint.json
 .build
-logs

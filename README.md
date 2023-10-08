@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/kit-icon.png" width="128" height="128"/>
+<img src="https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/kit-icon.png" width="128" height="128"/>
 
 # BezelKit
 
@@ -37,7 +37,7 @@ Another consideration stems from the variability in screen bezel dimensions acro
 
 1. If the actual bezel radius is smaller or larger than the static value, the UI corners will appear disproportionately thick or thin.
 
-   ![Zoomed - Static Value](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/zoomed-static.jpg)
+   ![Zoomed - Static Value](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/zoomed-static.jpg)
 
 2. On older devices or those with square screens, such as the SE models, the display will inaccurately feature curved corners when it should not.
 
@@ -45,7 +45,7 @@ While Apple has provided the [`ContainerRelativeShape`](https://developer.apple.
 
 A nice looking solution would look like this:
 
-![Zoomed - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/zoomed-bezelkit.jpg)
+![Zoomed - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/zoomed-bezelkit.jpg)
 
 ## Compatibility
 
@@ -99,7 +99,7 @@ let innerBezel = outerBezel - distance  // Perfect ratio
 
 By following this approach, you can ensure that your UI elements scale perfectly in relation to the device's bezel size.
 
-![Perfect scaling](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/ratio.jpg)
+![Perfect scaling](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/ratio.jpg)
 
 ### Setting a Fallback Bezel Size
 
@@ -256,7 +256,7 @@ struct ContentView: View {
 }
 ```
 
-![Comparison - Static Values](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/comparison-static.jpg)
+![Comparison - Static Values](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/comparison-static.jpg)
 
 In a fixed value configuration, devices with no curved screen look odd, while this `cornerRadius` is designed for the iPhone 14 Pro Max, it looks chunky on the iPhone 14, and *good-ish* on the iPhone 14 Pro.
 
@@ -275,7 +275,7 @@ struct ContentView: View {
 }
 ```
 
-![Comparison - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/comparison-bezelkit.jpg)
+![Comparison - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/comparison-bezelkit.jpg)
 
 As you can see, with no `setFallbackBezelKit` set, the iPhone SE (3rd generation) value is set to `0.0` and results in no curve. However, all other curved devices have a consistent look.
 
@@ -336,7 +336,7 @@ If you'd like to update or extend the list of device bezel sizes, you can easily
 
 1. **Adding to `pending` object**: Add more devices and their identifiers to the existing JSON file. Make sure the friendly names in the JSON match the "Device Type" from the `Create New Simulator` screen in Xcode.
 
-   ![Add New Simulator](https://raw.githubusercontent.com/markbattistella/BezelKit/main/Data/simulator.jpg)
+   ![Add New Simulator](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/simulator.jpg)
 
     ```json
     "pending" : {
