@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/kit-icon.png" width="128" height="128"/>
+<img alt="Icon of Package" src="https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/kit-icon.png" width="128" height="128"/>
 
 # BezelKit
 
@@ -22,12 +22,14 @@ By providing an easy-to-use API, `BezelKit` allows developers to focus more on t
 
 ## Rationale
 
-> **Quick Summary**
->
-> - No public API from Apple for fetching bezel sizes.
-> - Using internal APIs can jeopardise App Store eligibility.
-> - Static bezel values can cause UI distortions across devices.
-> - `BezelKit` offers an easy-to-use solution for accurate bezel metrics.
+### Quick summary
+
+> - There is **no** public API from Apple for fetching device bezel sizes
+> - Using the internal API can jeopardise App Store eligibility
+> - Static bezel values can cause UI distortions across devices
+> - `BezelKit` offers an easy-to-use solution for accurate bezel metrics
+
+### Longer explanation
 
 Apple currently does not offer a public API for fetching the bezel radius of its devices.
 
@@ -59,9 +61,15 @@ In terms of the devices supported though, it covers from the initial versions of
 
 The BezelKit package uses Swift Package Manager (SPM) for easy and convenient distribution. Follow these steps to add it to your project:
 
-1. In Xcode, click `File -> Swift Packages -> Add Package Dependency`.
+1. In Xcode, click `File -> Swift Packages -> Add Package Dependency`
+
 2. In the search bar, type `https://github.com/markbattistella/BezelKit` and click `Next`.
-3. Specify the version you want to use. You can select the exact version, use the latest one, or set a version range, and then click `Next`.
+
+3. Specify the version you want to use. You can select the exact version, use the latest one, or set a version range, and then click `Next`
+
+   > [!Tip]
+   > It's ideal to check the [change log for differences](https://github.com/markbattistella/BezelKit/blob/main/CHANGELOG.md) across versions
+
 4. Finally, select the target in which you want to use `BezelKit` and click `Finish`.
 
 ## Usage
@@ -131,25 +139,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 #### SwiftUI: Setting the Fallback on Appear
 
-For SwiftUI applications, you can set this value in the `.onAppear()` modifier for your main content view.
+For SwiftUI applications, you can set this value in the `init()` function for your main content view.
 
 ```swift
 import SwiftUI
 
 @main
 struct YourApp: App {
+  init() {
+    // Sets a fallback value of 10.0 and enables zero-check
+    CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
+  }
   var body: some Scene {
     WindowGroup {
       ContentView()
-        .onAppear() {
-
-          // Sets a fallback value of 10.0 and enables zero-check
-          CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
-        }
     }
   }
 }
 ```
+
+> [!Important]
+> Previously it was noted to use the `.onAppear` modifier for setting the fallback. This [caused a bug](https://github.com/markbattistella/BezelKit/issues/30) of not updating on launch
 
 #### Note
 
@@ -299,12 +309,13 @@ Contributions are more than welcome. If you find a bug or have an idea for an en
 
 Please follow the code style present in the current code base when making contributions.
 
-**Note**: any pull requests need to have the title in the following format, otherwise it will be rejected.
-
-```text
-YYYY-mm-dd - {title}
-eg. 2023-08-24 - Updated README file
-```
+> [!Note]
+> Any pull requests need to have the title in the following format, otherwise it will be rejected.
+>
+> ```text
+> YYYY-mm-dd - {title}
+> eg. 2023-08-24 - Updated README file
+> ```
 
 I like to track the day from logged request to completion, allowing sorting, and extraction of data. It helps me know how long things have been pending and provides OCD structure.
 

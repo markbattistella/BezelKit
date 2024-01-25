@@ -22,7 +22,10 @@ public extension CGFloat {
 	/// - Returns: A `CGFloat` representing the bezel radius for the current device or the fallback value if necessary.
 	static var deviceBezel: CGFloat {
 		if let currentBezel = DeviceBezel.currentBezel,
-		   !(shouldFallbackIfZero && currentBezel == 0.0) {
+           !(shouldFallbackIfZero && 
+             (currentBezel == 0.0 ||
+              currentBezel == 0 ||
+              currentBezel == .zero)) {
 			return currentBezel
 		}
 		return fallbackBezelValue
