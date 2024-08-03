@@ -6,8 +6,9 @@
 
 import Foundation
 
+@MainActor
 public extension CGFloat {
-	
+
 	/// A fallback value used when the device bezel radius cannot be determined.
 	private static var fallbackBezelValue: CGFloat = 0.0
 	
