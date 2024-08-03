@@ -7,6 +7,7 @@
 import UIKit
 
 /// `DeviceBezel` provides a mechanism to obtain the bezel radius of the current device.
+@MainActor
 public class DeviceBezel {
 
 	/// An enumeration of errors that can occur when attempting to obtain a device's bezel thickness.
@@ -22,18 +23,18 @@ public class DeviceBezel {
 	}
 
 	/// Cache to hold parsed device information.
-	private static var devices: Devices?
+    private static var devices: Devices?
 
 	/// A cache mapping device identifiers to their respective bezel thicknesses.
-	private static var cache: [String: CGFloat] = [:]
+    private static var cache: [String: CGFloat] = [:]
 
 	/// A callback to be invoked when an error occurs during bezel data fetching or processing.
-	public static var errorCallback: ((DeviceBezelError) -> Void)?
+    public static var errorCallback: ((DeviceBezelError) -> Void)?
 
 	/// Loads device data from the JSON resource, decoding and caching the relevant information.
 	///
 	/// - Throws: An error of type `DeviceBezelError` if there's an issue accessing or decoding the data.
-	private static func loadDeviceData() throws {
+    private static func loadDeviceData() throws {
 		guard let url = Bundle.module.url(
 			forResource: "bezel",
 			withExtension: "min.json"

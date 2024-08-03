@@ -1,15 +1,10 @@
-// swift-tools-version: 5.4
-//
-// Project: BezelKit
-// Author: Mark Battistella
-// Website: https://markbattistella.com
-//
+// swift-tools-version: 5.10
 
 import PackageDescription
 
 let package = Package(
 	name: "BezelKit",
-	platforms: [.iOS(.v11)],
+	platforms: [.iOS(.v12)],
 	products: [
 		.library(
             name: "BezelKit",
@@ -21,7 +16,10 @@ let package = Package(
 		.target(
 			name: "BezelKit",
             exclude: ["../../Generator"],
-			resources: [.process("Resources/bezel.min.json")]
+			resources: [.process("Resources/bezel.min.json")],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]
 		)
 	]
 )
