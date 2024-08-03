@@ -6,8 +6,10 @@
 
 <small>Perfecting Corners, One Radius at a Time</small>
 
-![Languages](https://img.shields.io/badge/Languages-Swift,%20SwiftUI,%20UIKit-white?labelColor=orange&style=flat)
-![Platforms](https://img.shields.io/badge/Platforms-iOS%2011+,%20iPadOS%2013+-white?labelColor=gray&style=flat)
+![Swift Versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmarkbattistella%2FBezelKit%2Fbadge%3Ftype%3Dswift-versions)
+
+![Platforms](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmarkbattistella%2FBezelKit%2Fbadge%3Ftype%3Dplatforms)
+
 ![Licence](https://img.shields.io/badge/Licence-MIT-white?labelColor=blue&style=flat)
 
 </div>
