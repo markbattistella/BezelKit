@@ -2,7 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2024.08
+
+### What's Changed
+
+- Auto-update SupportedDeviceList.md by @markbattistella-bot in #35
+- Swift 6 Concurrency by @markbattistella in #36
+
+## 2024.05
+
+<details>
+<summary>Expand</summary>
+
+### New numbering
+
+- We will now be using the YYYY.MM for the release tag
+- This way we can tell what devices should be on the list compared to release dates
+
+What's Changed
+
+- New Devices by @markbattistella in #33
+- Fix package exclusion by @markbattistella in #34
+
+</details>
+
 ## 2.0.2
+
+<details>
+<summary>Expand</summary>
 
 ### What's changed
 
@@ -10,6 +37,8 @@ All notable changes to this project will be documented in this file.
 
 - Updated README to detail using `init()` instead of `.onAppear` in SwiftUI
 - Fixed the checks for `0` value bezels
+
+</details>
 
 ## 2.0.1
 
