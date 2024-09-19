@@ -154,6 +154,10 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPhone 15 Plus | `iPhone15,5` | `55` |
 | iPhone 15 Pro | `iPhone16,1` | `55` |
 | iPhone 15 Pro Max | `iPhone16,2` | `55` |
+| iPhone 16 Pro | `iPhone17,1` | `62` |
+| iPhone 16 Pro Max | `iPhone17,2` | `62` |
+| iPhone 16 | `iPhone17,3` | `55` |
+| iPhone 16 Plus | `iPhone17,4` | `55` |
 
 ## iPod
 
