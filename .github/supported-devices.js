@@ -42,7 +42,7 @@ const jsonToMarkdown = (data) => {
 
   // Add _metadata information at the bottom
   const meta = data._metadata;
-  markdown += '---\n'; // Horizontal line for separation
+  markdown += '---\n\n'; // Horizontal line for separation
   markdown += `**Author**: [${meta.Author}](${meta.Website})\n`;
   markdown += `**Project**: ${meta.Project}\n`;
 
