@@ -90,6 +90,8 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPad Pro (12.9-inch) (6th generation) | `iPad14,6` | `18` |
 | iPad Air 11-inch (M2) | `iPad14,8` | `18` |
 | iPad Air 11-inch (M2) | `iPad14,9` | `18` |
+| iPad mini (A17 Pro) | `iPad16,1` | `21.5` |
+| iPad mini (A17 Pro) | `iPad16,2` | `21.5` |
 | iPad Pro 11-inch (M4) | `iPad16,3` | `30` |
 | iPad Pro 11-inch (M4) | `iPad16,4` | `30` |
 | iPad Pro 13-inch (M4) | `iPad16,5` | `30` |
@@ -172,5 +174,7 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPod touch (7th generation) | `iPod9,1` | `0` |
 
 ---
-**Author**: [Mark Battistella](https://markbattistella.com)
-**Project**: BezelKit - BezelGenerator
+
+| Author               | Project          |
+|----------------------|------------------|
+| [Mark Battistella](https://markbattistella.com) | BezelKit - BezelGenerator |
