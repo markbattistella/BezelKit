@@ -111,6 +111,8 @@ By following this approach, you can ensure that your UI elements scale perfectly
 
 ![Perfect scaling](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/ratio.jpg)
 
+You can use the `deviceBezel(with:)` function to pass in the margin size, and it will return the device bezel but perfectly scaled with the inner ratio.
+
 ### Setting a Fallback Bezel Size
 
 The package provides an easy way to specify a fallback bezel size. By default, the `CGFloat.deviceBezel` attribute returns `0.0` if it cannot ascertain the device's bezel size.
