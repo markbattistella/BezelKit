@@ -307,6 +307,17 @@ For generating new bezels please refer to the [`BezelKit - Generator`](https://g
 
 When running the script it is best to do so from the `BezelKit` directory as one of the script lines is to copy the compiled JSON into the `/Resources` directory. This will not exist from the view of the generator repo.
 
+## Apple's Apps
+
+You can see this style of Bezel `.sheet`s in some of Apple's own apps or their system-wide cards.
+
+For example, the Watch App on iOS or when you add a new device to the Home App:
+
+| Screenshot (raw) | With iPhone device bezel |
+|-|-|
+| ![Apple Watch iOS App](.github/data/watch-app.png) | ![Apple Watch iOS App](.github/data/watch-app-bezel.png) |
+| ![Apple Home iOS add new device card](.github/data/home-app.png) | ![Apple Home iOS add new device card](.github/data/home-app-bezel.png) |
+
 ## Contributing
 
 Contributions are more than welcome. If you find a bug or have an idea for an enhancement, please open an issue or provide a pull request.
