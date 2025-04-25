@@ -15,7 +15,7 @@ let package = Package(
 	targets: [
 		.target(
 			name: "BezelKit",
-            exclude: ["../../Generator"],
+			exclude: ["../../Generator"],
 			resources: [.process("Resources/bezel.min.json")],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
