@@ -67,10 +67,7 @@ The BezelKit package uses Swift Package Manager (SPM) for easy and convenient di
 
 2. In the search bar, type `https://github.com/markbattistella/BezelKit` and click `Next`.
 
-3. Specify the version you want to use. You can select the exact version, use the latest one, or set a version range, and then click `Next`
-
-   > [!Tip]
-   > It's ideal to check the [change log for differences](https://github.com/markbattistella/BezelKit/blob/main/CHANGELOG.md) across versions
+3. Specify the version you want to use, then click `Next`.
 
 4. Finally, select the target in which you want to use `BezelKit` and click `Finish`.
 
@@ -89,7 +86,7 @@ Using `BezelKit` is simple and can help you avoid complexities related to device
 1. Access the device bezel size:
 
    ```swift
-   let currentBezel = CGFloat.deviceBezel
+   let currentBezel: CGFloat = .deviceBezel
    ```
 
 For advanced usage, including perfect scaling of UI elements and setting fallback sizes, read the sections below.
@@ -100,10 +97,10 @@ The `BezelKit` package not only provides an easy way to access device-specific b
 
 When you have a rounded corner on the outer layer and an inner UI element that also needs a rounded corner, maintaining a perfect aspect ratio becomes essential for a harmonious design. This ensures your UI scales beautifully across different devices.
 
-Here's how to implement it:
+Here's how you'd manually implement it:
 
 ```swift
-let outerBezel = CGFloat.BezelKit
+let outerBezel: CGFloat = .deviceBezel
 let innerBezel = outerBezel - distance  // Perfect ratio
 ```
 
@@ -115,7 +112,7 @@ You can use the `deviceBezel(with:)` function to pass in the margin size, and it
 
 ### Setting a Fallback Bezel Size
 
-The package provides an easy way to specify a fallback bezel size. By default, the `CGFloat.deviceBezel` attribute returns `0.0` if it cannot ascertain the device's bezel size.
+The package provides an easy way to specify a fallback bezel size for all Apple device types. By default, the `CGFloat.deviceBezel` attribute returns `0.0` if it cannot ascertain the device's bezel size (on iOS / iPadOS).
 
 #### Enable Zero-Check Option
 
@@ -133,9 +130,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-    // Sets a fallback value of 10.0 and enables zero-check
-    CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
-    
+    // Sets a fallback value of 10.0 on iOS and enables zero-check
+    CGFloat.setFallbackConfig(
+      FallbackConfig(
+        iOS: (10.0, true)
+      )
+    )
+
     return true
   }
 }
@@ -151,8 +152,13 @@ import SwiftUI
 @main
 struct YourApp: App {
   init() {
-    // Sets a fallback value of 10.0 and enables zero-check
-    CGFloat.setFallbackDeviceBezel(10.0, ifZero: true)
+
+    // Sets a fallback value of 10.0 on iOS and enables zero-check
+    CGFloat.setFallbackConfig(
+      FallbackConfig(
+        iOS: (10.0, true)
+      )
+    )
   }
   var body: some Scene {
     WindowGroup {
@@ -163,11 +169,7 @@ struct YourApp: App {
 ```
 
 > [!Important]
-> Previously it was noted to use the `.onAppear` modifier for setting the fallback. This [caused a bug](https://github.com/markbattistella/BezelKit/issues/30) of not updating on launch
-
-#### Note
-
-You only need to call `setFallbackDeviceBezel(_:ifZero:)` **once**. Doing this as early as possible ensures the fallback setting is applied throughout your application.
+> You only need to call `setFallbackConfig(_:)` once, and as early as possible (like in your `App` init) to ensure it's applied globally.
 
 ### Effects of Setting a Fallback
 
@@ -190,6 +192,9 @@ print("Current device bezel: \(currentBezel)")
 
 // Output will be 0.0 if the device is not in the JSON data
 ```
+
+> [!Warning]
+> The previously documented method `setFallbackDeviceBezel(_:ifZero:)` has been deprecated and is unavailable. Please use `setFallbackConfig(_:)` with a `FallbackConfig` instance instead.
 
 ### Handling Errors with BezelKit
 
@@ -291,7 +296,7 @@ struct ContentView: View {
 
 ![Comparison - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/comparison-bezelkit.jpg)
 
-As you can see, with no `setFallbackBezelKit` set, the iPhone SE (3rd generation) value is set to `0.0` and results in no curve. However, all other curved devices have a consistent look.
+As you can see, with no `setFallbackConfig(_:)` set, the iPhone SE (3rd generation) value is set to `0.0` and results in no curve. However, all other curved devices have a consistent look.
 
 ## Things to note
 
@@ -332,8 +337,8 @@ Please follow the code style present in the current code base when making contri
 > eg. 2023-08-24 - Updated README file
 > ```
 
-I like to track the day from logged request to completion, allowing sorting, and extraction of data. It helps me know how long things have been pending and provides OCD structure.
+I like to track the day from logged request to completion, allowing sorting, and extraction of data. It helps me know how long things have been pending and provides structure.
 
 ## Licence
 
-The BezelKit package is released under the MIT licence. See [LICENCE](https://github.com/markbattistella/BezelKit/blob/main/LICENCE) for more information.
+`BezelKit` is released under the MIT license. See LICENCE for details.
