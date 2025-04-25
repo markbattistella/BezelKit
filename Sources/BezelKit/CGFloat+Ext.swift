@@ -9,58 +9,86 @@ import Foundation
 @MainActor
 extension CGFloat {
 
-    /// A fallback value used when the device bezel radius cannot be determined.
-    private static var fallbackBezelValue: CGFloat = 0.0
+    /// A configurable set of fallback values per platform, used when bezel data is unavailable
+    /// or zero.
+    static internal var fallbackConfig = FallbackConfig()
 
-    /// Indicates if the fallback value should be used when the determined bezel radius is zero.
-    private static var shouldFallbackIfZero: Bool = false
-
-    /// The bezel radius for the current device.
+    /// The bezel width of the current device, using actual data where available, or falling back
+    /// to a configured default value when appropriate.
     ///
-    /// If the bezel radius is not available or an error occurs, this property will use the
-    /// fallback value. If the bezel radius is zero and `shouldFallbackIfZero` is set to true,
-    /// it will also use the fallback value.
+    /// This property checks the current platform and applies the corresponding fallback only if
+    /// `applyIfZero` is set to `true`.
     ///
-    /// - Returns: A `CGFloat` representing the bezel radius for the current device or the
-    /// fallback value if necessary.
+    /// - For **iOS** (non-Mac Catalyst), it attempts to retrieve the actual bezel size via
+    /// `DeviceBezel`. If the value is `0` and fallback is allowed, it uses the configured iOS
+    /// fallback.
+    ///
+    /// - For **Mac Catalyst**, **macOS**, **tvOS**, **watchOS**, and **visionOS**, it directly
+    /// checks the fallback configuration and returns the value if permitted.
+    ///
+    /// - Returns: The device’s bezel width as a `CGFloat`, or a fallback/default value if none
+    /// available.
     public static var deviceBezel: CGFloat {
-        if let currentBezel = DeviceBezel.currentBezel,
-            !(shouldFallbackIfZero
-                && (currentBezel == 0.0 || currentBezel == 0 || currentBezel == .zero))
-        {
-            return currentBezel
-        }
-        return fallbackBezelValue
+        
+        #if os(iOS) && !targetEnvironment(macCatalyst)
+
+        let current = DeviceBezel.currentBezel ?? 0
+
+        return (current == .zero && fallbackConfig.iOS.applyIfZero) ? fallbackConfig.iOS.value : current
+
+        #elseif targetEnvironment(macCatalyst)
+
+        return fallbackConfig.macCatalyst.applyIfZero ? fallbackConfig.macCatalyst.value : 0
+
+        #elseif os(macOS)
+
+        return fallbackConfig.macOS.applyIfZero ? fallbackConfig.macOS.value : 0
+
+        #elseif os(tvOS)
+
+        return fallbackConfig.tvOS.applyIfZero ? fallbackConfig.tvOS.value : 0
+
+        #elseif os(watchOS)
+
+        return fallbackConfig.watchOS.applyIfZero ? fallbackConfig.watchOS.value : 0
+
+        #elseif os(visionOS)
+
+        return fallbackConfig.visionOS.applyIfZero ? fallbackConfig.visionOS.value : 0
+
+        #else
+
+        return 0
+
+        #endif
     }
 
-    /// Calculates the bezel radius with a specified margin.
+    /// Returns the device bezel with an optional margin subtracted from it.
     ///
-    /// - Parameter margin: The margin to subtract from the bezel radius.
-    /// - Returns: The bezel radius adjusted by the margin.
+    /// Useful when you need to inset a view or spacing from the bezel area to define a "safe
+    /// inner boundary".
+    ///
+    /// - Parameter margin: A margin to subtract from the computed bezel value.
+    /// - Returns: The bezel value minus the given margin.
     public static func deviceBezel(with margin: CGFloat) -> CGFloat {
         deviceBezel.innerRadius(with: margin)
     }
 
-    /// Sets a fallback value for the device bezel radius, to be used when the actual value
-    /// cannot be determined.
+    /// Sets the fallback configuration to use when a bezel value is missing or zero.
     ///
-    /// - Parameters:
-    ///   - value: The fallback bezel radius.
-    ///   - zero: A Boolean indicating if the fallback value should be used when the determined
-    ///   bezel radius is zero.
-    public static func setFallbackDeviceBezel(_ value: CGFloat, ifZero zero: Bool = false) {
-        fallbackBezelValue = value
-        shouldFallbackIfZero = zero
+    /// - Parameter config: The fallback values to use across all supported platforms.
+    public static func setFallbackConfig(_ config: FallbackConfig) {
+        fallbackConfig = config
     }
 }
 
 extension Numeric where Self: Comparable {
 
-    /// Calculates the inner radius by subtracting a given margin.
+    /// Subtracts the given margin from the current value.
     ///
-    /// - Parameter margin: The margin to subtract from the current radius.
-    /// - Returns: The calculated inner radius.
-    func innerRadius(with margin: Self) -> Self {
+    /// - Parameter margin: The value to subtract.
+    /// - Returns: The result of `self - margin`.
+    internal func innerRadius(with margin: Self) -> Self {
         return self - margin
     }
 }
