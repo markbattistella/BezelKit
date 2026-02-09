@@ -93,6 +93,7 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPad Air 11-inch (M3) | `iPad15,3` | `18` |
 | iPad Air 13-inch (M3) | `iPad15,5` | `18` |
 | iPad (A16) | `iPad15,7` | `25` |
+| iPad (A16) | `iPad15,8` | `25` |
 | iPad mini (A17 Pro) | `iPad16,1` | `21.5` |
 | iPad mini (A17 Pro) | `iPad16,2` | `21.5` |
 | iPad Pro 11-inch (M4) | `iPad16,3` | `30` |
@@ -101,6 +102,10 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPad Pro 13-inch (M4) | `iPad16,6` | `30` |
 | iPad Pro (12.9-inch) (1st generation) | `iPad16,7` | `0` |
 | iPad Pro (12.9-inch) (1st generation) | `iPad16,8` | `0` |
+| iPad Pro 11-inch (M5) | `iPad17,1` | `30` |
+| iPad Pro 11-inch (M5) | `iPad17,2` | `30` |
+| iPad Pro 13-inch (M5) | `iPad17,3` | `30` |
+| iPad Pro 13-inch (M5) | `iPad17,4` | `30` |
 
 ## iPhone
 
