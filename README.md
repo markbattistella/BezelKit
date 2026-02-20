@@ -316,7 +316,7 @@ Run from the `Generator/` directory:
 swift run BezelGenerator
 ```
 
-See [`Generator/README`]([Generator/README.md](https://github.com/markbattistella/BezelKit-Generator/) for full documentation, including subcommands and database structure.
+See [`Generator/README`](https://github.com/markbattistella/BezelKit-Generator/) for full documentation, including subcommands and database structure.
 
 ## Apple's Apps
 
