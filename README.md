@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="Icon of Package" src="https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/kit-icon.png" width="128" height="128"/>
+<img alt="Icon of Package" src="https://raw.githubusercontent.com/markbattistella/BezelKit/main/data/kit-icon.png" width="128" height="128"/>
 
 # BezelKit
 
@@ -41,7 +41,7 @@ Another consideration stems from the variability in screen bezel dimensions acro
 
 1. If the actual bezel radius is smaller or larger than the static value, the UI corners will appear disproportionately thick or thin.
 
-   ![Zoomed - Static Value](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/zoomed-static.jpg)
+   ![Zoomed - Static Value](https://raw.githubusercontent.com/markbattistella/BezelKit/main/data/zoomed-static.jpg)
 
 2. On older devices or those with square screens, such as the SE models, the display will inaccurately feature curved corners when it should not.
 
@@ -49,7 +49,7 @@ While Apple has provided the [`ContainerRelativeShape`](https://developer.apple.
 
 A nice looking solution would look like this:
 
-![Zoomed - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/zoomed-bezelkit.jpg)
+![Zoomed - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/data/zoomed-bezelkit.jpg)
 
 ## Compatibility
 
@@ -106,7 +106,7 @@ let innerBezel = outerBezel - distance  // Perfect ratio
 
 By following this approach, you can ensure that your UI elements scale perfectly in relation to the device's bezel size.
 
-![Perfect scaling](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/ratio.jpg)
+![Perfect scaling](https://raw.githubusercontent.com/markbattistella/BezelKit/main/data/ratio.jpg)
 
 You can use the `deviceBezel(with:)` function to pass in the margin size, and it will return the device bezel but perfectly scaled with the inner ratio.
 
@@ -250,7 +250,7 @@ class ViewController: UIViewController {
       alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
       self?.present(alert, animated: true, completion: nil)
     }
-        
+
     let bezelValue = CGFloat.deviceBezel
     // Use bezelValue for your views
   }
@@ -275,7 +275,7 @@ struct ContentView: View {
 }
 ```
 
-![Comparison - Static Values](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/comparison-static.jpg)
+![Comparison - Static Values](https://raw.githubusercontent.com/markbattistella/BezelKit/main/data/comparison-static.jpg)
 
 In a fixed value configuration, devices with no curved screen look odd, while this `cornerRadius` is designed for the iPhone 14 Pro Max, it looks chunky on the iPhone 14, and *good-ish* on the iPhone 14 Pro.
 
@@ -294,7 +294,7 @@ struct ContentView: View {
 }
 ```
 
-![Comparison - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/.github/data/comparison-bezelkit.jpg)
+![Comparison - BezelKit](https://raw.githubusercontent.com/markbattistella/BezelKit/main/data/comparison-bezelkit.jpg)
 
 As you can see, with no `setFallbackConfig(_:)` set, the iPhone SE (3rd generation) value is set to `0.0` and results in no curve. However, all other curved devices have a consistent look.
 
@@ -308,9 +308,15 @@ There is also no way to automate zoom levels in `xcrun simctl` so it would have 
 
 ## Generating New Bezels
 
-For generating new bezels please refer to the [`BezelKit - Generator`](https://github.com/markbattistella/BezelKit-Generator) repository.
+The `Generator/` directory contains a Swift CLI tool for extracting bezel data from iOS Simulators and updating the package resource.
 
-When running the script it is best to do so from the `BezelKit` directory as one of the script lines is to copy the compiled JSON into the `/Resources` directory. This will not exist from the view of the generator repo.
+Run from the `Generator/` directory:
+
+```bash
+swift run BezelGenerator
+```
+
+See [`Generator/README.md`](Generator/README.md) for full documentation, including subcommands and database structure.
 
 ## Apple's Apps
 
@@ -319,9 +325,9 @@ You can see this style of Bezel `.sheet`s in some of Apple's own apps or their s
 For example, the Watch App on iOS or when you add a new device to the Home App:
 
 | Screenshot (raw) | With iPhone device bezel |
-|-|-|
-| ![Apple Watch iOS App](.github/data/watch-app.png) | ![Apple Watch iOS App](.github/data/watch-app-bezel.png) |
-| ![Apple Home iOS add new device card](.github/data/home-app.png) | ![Apple Home iOS add new device card](.github/data/home-app-bezel.png) |
+| - | - |
+| ![Apple Watch iOS App](data/watch-app.png) | ![Apple Watch iOS App](data/watch-app-bezel.png) |
+| ![Apple Home iOS add new device card](data/home-app.png) | ![Apple Home iOS add new device card](data/home-app-bezel.png) |
 
 ## Contributing
 

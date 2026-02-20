@@ -1,7 +1,9 @@
 #!/bin/bash
 
+set -e
+
 echo "Generating SupportedDeviceList.md from JSON..."
-node ./.github/supported-devices.js
+(cd ./Generator && swift run BezelGenerator generate-docs)
 
 if [[ `git status --porcelain` ]]; then
 
