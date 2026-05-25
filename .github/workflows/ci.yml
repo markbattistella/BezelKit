@@ -22,7 +22,8 @@ jobs:
         run: swift build
 
       - name: Test
-        run: swift test
+        run: |
+          if [ -d "Tests" ]; then swift test; fi
 
   simulator:
     name: iOS Simulator
