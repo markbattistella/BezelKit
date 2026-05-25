@@ -10,31 +10,31 @@ import Foundation
 ///
 /// This structure is typically loaded from a JSON file (e.g., `bezel.min.json`) and contains
 /// bezel information for various Apple device types.
-internal struct Database: Decodable {
+internal struct Database: Decodable, Sendable {
 
-    /// A nested container holding device information grouped by type (iPad, iPhone, iPod).
-    let devices: Devices
+  /// A nested container holding device information grouped by type (iPad, iPhone, iPod).
+  let devices: Devices
 
-    /// A collection of devices grouped by type.
-    internal struct Devices: Decodable {
+  /// A collection of devices grouped by type.
+  internal struct Devices: Decodable, Sendable {
 
-        /// Dictionary of iPad model identifiers and their associated info.
-        let iPad: [String: DeviceInfo]
+    /// Dictionary of iPad model identifiers and their associated info.
+    let iPad: [String: DeviceInfo]
 
-        /// Dictionary of iPhone model identifiers and their associated info.
-        let iPhone: [String: DeviceInfo]
+    /// Dictionary of iPhone model identifiers and their associated info.
+    let iPhone: [String: DeviceInfo]
 
-        /// Dictionary of iPod model identifiers and their associated info.
-        let iPod: [String: DeviceInfo]
+    /// Dictionary of iPod model identifiers and their associated info.
+    let iPod: [String: DeviceInfo]
 
-        /// Detailed information about a specific device model.
-        internal struct DeviceInfo: Decodable {
+    /// Detailed information about a specific device model.
+    internal struct DeviceInfo: Decodable, Sendable {
 
-            /// The bezel width of the device in points.
-            let bezel: Double
+      /// The bezel width of the device in points.
+      let bezel: Double
 
-            /// A human-readable name of the device (e.g., "iPhone 14 Pro").
-            let name: String
-        }
+      /// A human-readable name of the device (e.g., "iPhone 14 Pro").
+      let name: String
     }
+  }
 }

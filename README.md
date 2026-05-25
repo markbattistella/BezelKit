@@ -71,6 +71,24 @@ The BezelKit package uses Swift Package Manager (SPM) for easy and convenient di
 
 4. Finally, select the target in which you want to use `BezelKit` and click `Finish`.
 
+Or add it to your package manifest:
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/markbattistella/BezelKit", from: "26.0.0")
+]
+```
+
+## Requirements
+
+- Swift 6.0+
+- iOS 12+
+- macOS 10.13+
+- Mac Catalyst 13.1+
+- tvOS 12+
+- watchOS 4+
+- visionOS 1+
+
 ## Usage
 
 Using `BezelKit` is simple and can help you avoid complexities related to device metrics.
@@ -183,7 +201,7 @@ print("Current device bezel: \(currentBezel)")
 // Output will be 10.0 if the device is not in the JSON data or the bezel is zero
 ```
 
-If no fallback is set, `CGFloat.BezelKit` defaults to `0.0` when the device-specific bezel size is unavailable.
+If no fallback is set, `CGFloat.deviceBezel` defaults to `0.0` when the device-specific bezel size is unavailable.
 
 ```swift
 // With no fallback set and zero check disabled
@@ -218,10 +236,10 @@ struct ContentView: View {
     RoundedRectangle(cornerRadius: .deviceBezel)
       .stroke(Color.green, lineWidth: 20)
       .ignoresSafeArea()
-      .alert(isPresented: $showErrorAlert) {
-        Alert(title: Text("Error"),
-              message: Text(errorMessage),
-              dismissButton: .default(Text("Got it!")))
+      .alert("Error", isPresented: $showErrorAlert) {
+        Button("Got it!") {}
+      } message: {
+        Text(errorMessage)
       }
       .onAppear {
           DeviceBezel.errorCallback = { error in
@@ -279,7 +297,7 @@ struct ContentView: View {
 
 In a fixed value configuration, devices with no curved screen look odd, while this `cornerRadius` is designed for the iPhone 14 Pro Max, it looks chunky on the iPhone 14, and *good-ish* on the iPhone 14 Pro.
 
-This was the code when using a `BezelKit`:
+This was the code when using `BezelKit`:
 
 ```swift
 import SwiftUI
@@ -300,11 +318,11 @@ As you can see, with no `setFallbackConfig(_:)` set, the iPhone SE (3rd generati
 
 ## Things to note
 
-`BezelKit` **does not** currently support the affects from display zooming. When the generator runs, it performs all extractions on the "Standard" zoom level of the device.
+`BezelKit` **does not** currently support the effects from display zooming. When the generator runs, it performs all extractions on the "Standard" zoom level of the device.
 
 If this was run on the "Zoomed" level, then the bezel radius would be different. However, since the physical device cannot change based on the zoom level, using "Standard" is the correct CGFloat number.
 
-There is also no way to automate zoom levels in `xcrun simctl` so it would have to be a manual inclusion, and at this point in time (unless raised via Issues) there is no really benefit for using the zoomed value for `_displayRoundedCorner`.
+There is also no way to automate zoom levels in `xcrun simctl` so it would have to be a manual inclusion, and at this point in time (unless raised via Issues) there is no real benefit for using the zoomed value for `_displayRoundedCorner`.
 
 ## Generating New Bezels
 

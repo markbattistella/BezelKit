@@ -4,11 +4,11 @@
 // Website: https://markbattistella.com
 //
 
-#if canImport(UIKit)
+#if os(iOS) && !targetEnvironment(macCatalyst)
 
-import UIKit
+  import UIKit
 
-extension UIDevice {
+  extension UIDevice {
 
     /// A string that uniquely identifies the model of the current device.
     ///
@@ -21,12 +21,12 @@ extension UIDevice {
     /// - Returns: A string representing the model identifier, or an empty string if unavailable.
     internal var modelIdentifier: String {
 
-        #if targetEnvironment(simulator)
+      #if targetEnvironment(simulator)
 
         /// Retrieves the model identifier from the environment variable when running in a simulator.
-        return ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] ?? ""
+        return ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] ?? ""
 
-        #else
+      #else
 
         /// Populates system info and extracts the model identifier for physical devices.
         var systemInfo = utsname()
@@ -35,12 +35,12 @@ extension UIDevice {
         /// Reflects on the machine field of the utsname struct to build the identifier string.
         let machineMirror = Mirror(reflecting: systemInfo.machine)
         return machineMirror.children.compactMap { $0.value as? Int8 }
-            .filter { $0 != 0 }
-            .map { String(UnicodeScalar(UInt8($0))) }
-            .joined()
+          .filter { $0 != 0 }
+          .map { String(UnicodeScalar(UInt8($0))) }
+          .joined()
 
-        #endif
+      #endif
     }
-}
+  }
 
 #endif

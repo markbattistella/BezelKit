@@ -4,9 +4,12 @@
 // Website: https://markbattistella.com
 //
 
-#if canImport(UIKit)
+import CoreGraphics
+import Foundation
 
-import UIKit
+#if os(iOS) && !targetEnvironment(macCatalyst)
+  import UIKit
+#endif
 
 /// A utility class for retrieving bezel sizes of Apple devices based on model identifiers.
 ///
@@ -14,67 +17,69 @@ import UIKit
 /// information for known Apple device models. It supports caching and includes error reporting
 /// via an optional callback.
 @MainActor
-public class DeviceBezel {
+public final class DeviceBezel {
 
-    /// Possible errors thrown or reported during device data loading and decoding.
-    public enum DeviceBezelError: Error {
+  /// Possible errors thrown or reported during device data loading and decoding.
+  public enum DeviceBezelError: Error, Sendable {
 
-        /// Thrown when the JSON resource file could not be found in the bundle.
-        case resourceNotFound
+    /// Thrown when the JSON resource file could not be found in the bundle.
+    case resourceNotFound
 
-        /// Thrown when the data fails to decode properly, includes context.
-        case dataParsingFailed(String)
+    /// Thrown when the data fails to decode properly, includes context.
+    case dataParsingFailed(String)
+  }
+
+  /// The in-memory representation of decoded device data.
+  private static var devices: Database.Devices?
+
+  /// A cache mapping device model identifiers (e.g., `"iPhone14,2"`) to their bezel sizes.
+  private static var cache: [String: CGFloat] = [:]
+
+  /// An optional callback for handling errors encountered during data loading.
+  public static var errorCallback: ((DeviceBezelError) -> Void)?
+
+  /// Loads and decodes the device bezel data from the embedded JSON resource file.
+  ///
+  /// This method throws an error if the file is not found or if decoding fails. Upon successful
+  /// decoding, the data is cached for quick access.
+  private static func loadDeviceData() throws {
+    guard
+      let url = Bundle.module.url(
+        forResource: "bezel.min",
+        withExtension: "json"
+      )
+    else {
+      throw DeviceBezelError.resourceNotFound
     }
 
-    /// The in-memory representation of decoded device data.
-    private static var devices: Database.Devices?
+    let data = try Data(contentsOf: url)
+    let decodedData = try JSONDecoder().decode(Database.self, from: data)
+    self.devices = decodedData.devices
+    cacheDevices(from: decodedData.devices)
+  }
 
-    /// A cache mapping device model identifiers (e.g., `"iPhone14,2"`) to their bezel sizes.
-    private static var cache: [String: CGFloat] = [:]
-    
-    /// An optional callback for handling errors encountered during data loading.
-    public static var errorCallback: ((DeviceBezelError) -> Void)?
+  /// Caches the bezel data from all supported device types.
+  ///
+  /// - Parameter devices: The decoded `Database.Devices` structure.
+  private static func cacheDevices(from devices: Database.Devices) {
+    cacheDeviceType(devices.iPad)
+    cacheDeviceType(devices.iPhone)
+    cacheDeviceType(devices.iPod)
+  }
 
-    /// Loads and decodes the device bezel data from the embedded JSON resource file.
-    ///
-    /// This method throws an error if the file is not found or if decoding fails. Upon successful
-    /// decoding, the data is cached for quick access.
-    private static func loadDeviceData() throws {
-        guard
-            let url = Bundle.module.url(
-                forResource: "bezel.min",
-                withExtension: "json"
-            )
-        else {
-            throw DeviceBezelError.resourceNotFound
-        }
-
-        let data = try Data(contentsOf: url)
-        let decodedData = try JSONDecoder().decode(Database.self, from: data)
-        self.devices = decodedData.devices
-        cacheDevices(from: decodedData.devices)
+  /// Adds bezel values to the cache for a specific type of device.
+  ///
+  /// - Parameter deviceType: A dictionary of device identifiers to `DeviceInfo`.
+  private static func cacheDeviceType(_ deviceType: [String: Database.Devices.DeviceInfo]) {
+    for (identifier, deviceInfo) in deviceType {
+      cache[identifier] = CGFloat(deviceInfo.bezel)
     }
-
-    /// Caches the bezel data from all supported device types.
-    ///
-    /// - Parameter devices: The decoded `Database.Devices` structure.
-    private static func cacheDevices(from devices: Database.Devices) {
-        cacheDeviceType(devices.iPad)
-        cacheDeviceType(devices.iPhone)
-        cacheDeviceType(devices.iPod)
-    }
-
-    /// Adds bezel values to the cache for a specific type of device.
-    ///
-    /// - Parameter deviceType: A dictionary of device identifiers to `DeviceInfo`.
-    private static func cacheDeviceType(_ deviceType: [String: Database.Devices.DeviceInfo]) {
-        for (identifier, deviceInfo) in deviceType {
-            cache[identifier] = CGFloat(deviceInfo.bezel)
-        }
-    }
+  }
 }
 
-extension DeviceBezel {
+#if os(iOS) && !targetEnvironment(macCatalyst)
+
+  extension DeviceBezel {
 
     /// The bezel size of the current device, if available.
     ///
@@ -84,51 +89,51 @@ extension DeviceBezel {
     ///
     /// - Returns: A `CGFloat` representing the bezel size in points, or `nil` if unavailable.
     internal static var currentBezel: CGFloat? {
-        if devices == nil {
-            do {
-                try loadDeviceData()
-            } catch let error as DeviceBezelError {
-                errorCallback?(error)
-                return nil
-            } catch let error as DecodingError {
-                errorCallback?(handleDecodingError(error))
-                return nil
-            } catch {
-                errorCallback?(.dataParsingFailed(error.localizedDescription))
-                return nil
-            }
+      if devices == nil {
+        do {
+          try loadDeviceData()
+        } catch let error as DeviceBezelError {
+          errorCallback?(error)
+          return nil
+        } catch let error as DecodingError {
+          errorCallback?(handleDecodingError(error))
+          return nil
+        } catch {
+          errorCallback?(.dataParsingFailed(error.localizedDescription))
+          return nil
         }
+      }
 
-        let identifier = UIDevice.current.modelIdentifier
-        return cache[identifier]
+      let identifier = UIDevice.current.modelIdentifier
+      return cache[identifier]
     }
-}
+  }
+
+#endif
 
 extension DeviceBezel {
 
-    /// Converts a `DecodingError` into a `DeviceBezelError` with human-readable context.
-    ///
-    /// - Parameter error: The decoding error to convert.
-    /// - Returns: A `DeviceBezelError` containing a description of the failure.
-    internal static func handleDecodingError(_ error: DecodingError) -> DeviceBezelError {
-        switch error {
+  /// Converts a `DecodingError` into a `DeviceBezelError` with human-readable context.
+  ///
+  /// - Parameter error: The decoding error to convert.
+  /// - Returns: A `DeviceBezelError` containing a description of the failure.
+  internal static func handleDecodingError(_ error: DecodingError) -> DeviceBezelError {
+    switch error {
 
-            case let .dataCorrupted(context):
-                return .dataParsingFailed(context.debugDescription)
+    case .dataCorrupted(let context):
+      return .dataParsingFailed(context.debugDescription)
 
-            case let .keyNotFound(key, context):
-                return .dataParsingFailed("Key '\(key)' not found: \(context.debugDescription)")
+    case .keyNotFound(let key, let context):
+      return .dataParsingFailed("Key '\(key)' not found: \(context.debugDescription)")
 
-            case let .valueNotFound(value, context):
-                return .dataParsingFailed("Value '\(value)' not found: \(context.debugDescription)")
+    case .valueNotFound(let value, let context):
+      return .dataParsingFailed("Value '\(value)' not found: \(context.debugDescription)")
 
-            case let .typeMismatch(type, context):
-                return .dataParsingFailed("Type '\(type)' mismatch: \(context.debugDescription)")
+    case .typeMismatch(let type, let context):
+      return .dataParsingFailed("Type '\(type)' mismatch: \(context.debugDescription)")
 
-            @unknown default:
-                return .dataParsingFailed("Unknown DecodingError encountered.")
-        }
+    @unknown default:
+      return .dataParsingFailed("Unknown DecodingError encountered.")
     }
+  }
 }
-
-#endif
