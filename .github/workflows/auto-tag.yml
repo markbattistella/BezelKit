@@ -1,0 +1,183 @@
+name: Auto tag
+
+# Tags and releases whenever the shipped device data changes on main — a merged device scan
+# pull request, or any other push that touches bezel.min.json.
+#
+# For SwiftPM the tag *is* the release: an untagged commit reaches nobody depending on a
+# version rule. Tooling, workflow and documentation changes are deliberately not tagged,
+# because there is nothing in them for a consumer to consume.
+#
+# Versions are CalVer, yy.m.d, never zero-padded — semver rejects leading zeroes, so a tag
+# like 26.02.10 is silently ignored by SwiftPM.
+#
+# Required secrets: BOT_APP_CLIENT_ID, BOT_APP_PRIVATE_KEY
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Sources/BezelKit/Resources/bezel.min.json'
+  workflow_dispatch:
+
+concurrency:
+  group: auto-tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Tag release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      HAS_BOT: ${{ secrets.BOT_APP_CLIENT_ID != '' }}
+      RESOURCE: Sources/BezelKit/Resources/bezel.min.json
+
+    steps:
+      - name: Create GitHub App token
+        id: app-token
+        if: env.HAS_BOT == 'true'
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
+        # No submodule access needed — tags and releases live on this repository only.
+
+      - name: Get GitHub App user ID
+        id: app-user
+        if: env.HAS_BOT == 'true'
+        run: echo "id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token || github.token }}
+
+      - name: Should this commit be tagged?
+        id: check
+        run: |
+          set -euo pipefail
+
+          # A local `generate-docs --release` already tags before pushing. Never double-tag it.
+          if existing=$(git tag --points-at HEAD | head -1); [ -n "$existing" ]; then
+            echo "Already tagged as $existing — nothing to do."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "proceed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Work out the next tag
+        id: version
+        if: steps.check.outputs.proceed == 'true'
+        run: |
+          set -euo pipefail
+
+          YY=$(date -u +%y)
+          M=$(date -u +%-m)
+          D=$(date -u +%-d)
+
+          # Same-day releases would collide, so the day component doubles as a counter.
+          # Values stay valid semver and strictly increasing, which is what SwiftPM needs.
+          TAG="$YY.$M.$D"
+          n=$D
+          while git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; do
+            n=$((n + 1))
+            TAG="$YY.$M.$n"
+          done
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Next tag: $TAG"
+
+      - name: Build release notes
+        id: notes
+        if: steps.check.outputs.proceed == 'true'
+        run: |
+          set -euo pipefail
+
+          BEFORE="${{ github.event.before }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BEFORE^{commit}" 2> /dev/null; then
+            BEFORE="HEAD~1"
+          fi
+
+          git show "$BEFORE:$RESOURCE" > /tmp/old.json 2> /dev/null || echo '{"devices":{}}' > /tmp/old.json
+          cp "$RESOURCE" /tmp/new.json
+
+          jq -r -n --slurpfile old /tmp/old.json --slurpfile new /tmp/new.json '
+            def entries($doc):
+              ($doc[0].devices // {}) | to_entries
+              | map(.key as $cat | .value | to_entries | map(. + {cat: $cat}))
+              | flatten;
+
+            (entries($old) | map({key: .key, value: .value}) | from_entries) as $o
+            | entries($new) as $n
+            | ($n | map(select($o[.key] == null))) as $added
+            | ($n | map(select($o[.key] != null and $o[.key] != .value))) as $changed
+            | [
+                (if ($added | length) > 0 then
+                  "## Added Devices\n\n" +
+                  ([ "iPad", "iPhone", "iPod" ] | map(. as $c |
+                    ($added | map(select(.cat == $c))) as $g |
+                    if ($g | length) > 0 then
+                      "### \($c)\n\n" + ($g | map("- \(.value.name) (`\(.key)`)") | join("\n"))
+                    else empty end
+                  ) | join("\n\n"))
+                else empty end),
+                (if ($changed | length) > 0 then
+                  "## Updated Devices\n\n" +
+                  ($changed | map(
+                    $o[.key] as $was |
+                    if $was.bezel != .value.bezel then
+                      "- \(.value.name) (`\(.key)`): bezel \($was.bezel) → \(.value.bezel)"
+                    else
+                      "- `\(.key)`: renamed \"\($was.name)\" → \"\(.value.name)\""
+                    end) | join("\n"))
+                else empty end)
+              ]
+            | if length == 0 then "No device changes." else join("\n\n") end
+          ' > /tmp/notes.md
+
+          cat /tmp/notes.md
+          cat /tmp/notes.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create tag and release
+        if: steps.check.outputs.proceed == 'true' && env.HAS_BOT == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          APP_USER_ID: ${{ steps.app-user.outputs.id }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          git config user.name  "${APP_SLUG}[bot]"
+          git config user.email "${APP_USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          git tag -a "$TAG" -m "$TAG"
+          git push origin "$TAG"
+
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$TAG" \
+            --notes-file /tmp/notes.md
+
+          echo "Released $TAG" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Note missing bot credentials
+        if: steps.check.outputs.proceed == 'true' && env.HAS_BOT != 'true'
+        run: |
+          {
+            echo '> [!WARNING]'
+            echo '> `bezel.min.json` changed but `BOT_APP_CLIENT_ID` / `BOT_APP_PRIVATE_KEY`'
+            echo '> are not set, so no tag was created.'
+          } >> "$GITHUB_STEP_SUMMARY"
