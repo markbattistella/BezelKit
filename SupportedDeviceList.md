@@ -4,115 +4,115 @@ Below is the current supported list of devices `BezelKit` can return data for.
 
 ## iPad
 
-| Device                                | Model Identifier | Bezel Size |
-| ------------------------------------- | ---------------- | ---------- |
-| iPad                                  | `iPad1,1`        | `0`        |
-| iPad 2                                | `iPad2,1`        | `0`        |
-| iPad 2                                | `iPad2,2`        | `0`        |
-| iPad 2                                | `iPad2,3`        | `0`        |
-| iPad 2                                | `iPad2,4`        | `0`        |
-| iPad mini                             | `iPad2,5`        | `0`        |
-| iPad mini                             | `iPad2,6`        | `0`        |
-| iPad mini                             | `iPad2,7`        | `0`        |
-| iPad (3rd generation)                 | `iPad3,1`        | `0`        |
-| iPad (3rd generation)                 | `iPad3,2`        | `0`        |
-| iPad (3rd generation)                 | `iPad3,3`        | `0`        |
-| iPad (4th generation)                 | `iPad3,4`        | `0`        |
-| iPad (4th generation)                 | `iPad3,5`        | `0`        |
-| iPad (4th generation)                 | `iPad3,6`        | `0`        |
-| iPad Air                              | `iPad4,1`        | `0`        |
-| iPad Air                              | `iPad4,2`        | `0`        |
-| iPad Air                              | `iPad4,3`        | `0`        |
-| iPad mini 2                           | `iPad4,4`        | `0`        |
-| iPad mini 2                           | `iPad4,5`        | `0`        |
-| iPad mini 2                           | `iPad4,6`        | `0`        |
-| iPad mini 3                           | `iPad4,7`        | `0`        |
-| iPad mini 3                           | `iPad4,8`        | `0`        |
-| iPad mini 3                           | `iPad4,9`        | `0`        |
-| iPad mini 4                           | `iPad5,1`        | `0`        |
-| iPad mini 4                           | `iPad5,2`        | `0`        |
-| iPad Air 2                            | `iPad5,3`        | `0`        |
-| iPad Air 2                            | `iPad5,4`        | `0`        |
-| iPad (5th generation)                 | `iPad6,11`       | `0`        |
-| iPad (5th generation)                 | `iPad6,12`       | `0`        |
-| iPad Pro (9.7-inch)                   | `iPad6,3`        | `0`        |
-| iPad Pro (9.7-inch)                   | `iPad6,4`        | `0`        |
-| iPad Pro (12.9-inch) (1st generation) | `iPad6,7`        | `0`        |
-| iPad Pro (12.9-inch) (1st generation) | `iPad6,8`        | `0`        |
-| iPad Pro (12.9-inch) (2nd generation) | `iPad7,1`        | `0`        |
-| iPad (7th generation)                 | `iPad7,11`       | `0`        |
-| iPad (7th generation)                 | `iPad7,12`       | `0`        |
-| iPad Pro (12.9-inch) (2nd generation) | `iPad7,2`        | `0`        |
-| iPad Pro (10.5-inch)                  | `iPad7,3`        | `0`        |
-| iPad Pro (10.5-inch)                  | `iPad7,4`        | `0`        |
-| iPad (6th generation)                 | `iPad7,5`        | `0`        |
-| iPad (6th generation)                 | `iPad7,6`        | `0`        |
-| iPad Pro (11-inch) (1st generation)   | `iPad8,1`        | `18`       |
-| iPad Pro (11-inch) (2nd generation)   | `iPad8,10`       | `18`       |
-| iPad Pro (12.9-inch) (4th generation) | `iPad8,11`       | `18`       |
-| iPad Pro (12.9-inch) (4th generation) | `iPad8,12`       | `18`       |
-| iPad Pro (11-inch) (1st generation)   | `iPad8,2`        | `18`       |
-| iPad Pro (11-inch) (1st generation)   | `iPad8,3`        | `18`       |
-| iPad Pro (11-inch) (1st generation)   | `iPad8,4`        | `18`       |
-| iPad Pro (12.9-inch) (3rd generation) | `iPad8,5`        | `18`       |
-| iPad Pro (12.9-inch) (3rd generation) | `iPad8,6`        | `18`       |
-| iPad Pro (12.9-inch) (3rd generation) | `iPad8,7`        | `18`       |
-| iPad Pro (12.9-inch) (3rd generation) | `iPad8,8`        | `18`       |
-| iPad Pro (11-inch) (2nd generation)   | `iPad8,9`        | `18`       |
-| iPad mini (5th generation)            | `iPad11,1`       | `0`        |
-| iPad mini (5th generation)            | `iPad11,2`       | `0`        |
-| iPad Air (3rd generation)             | `iPad11,3`       | `0`        |
-| iPad Air (3rd generation)             | `iPad11,4`       | `0`        |
-| iPad (8th generation)                 | `iPad11,6`       | `0`        |
-| iPad (8th generation)                 | `iPad11,7`       | `0`        |
-| iPad (9th generation)                 | `iPad12,1`       | `0`        |
-| iPad (9th generation)                 | `iPad12,2`       | `0`        |
-| iPad Air (4th generation)             | `iPad13,1`       | `18`       |
-| iPad Pro (12.9-inch) (5th generation) | `iPad13,10`      | `18`       |
-| iPad Pro (12.9-inch) (5th generation) | `iPad13,11`      | `18`       |
-| iPad mini (6th generation)            | `iPad13,12`      | `18`       |
-| iPad Air (5th generation)             | `iPad13,16`      | `18`       |
-| iPad Air (5th generation)             | `iPad13,17`      | `18`       |
-| iPad (10th generation)                | `iPad13,18`      | `25`       |
-| iPad (10th generation)                | `iPad13,19`      | `25`       |
-| iPad Air (4th generation)             | `iPad13,2`       | `18`       |
-| iPad Pro (11-inch) (3rd generation)   | `iPad13,4`       | `18`       |
-| iPad Pro (11-inch) (3rd generation)   | `iPad13,5`       | `18`       |
-| iPad Pro (11-inch) (3rd generation)   | `iPad13,6`       | `18`       |
-| iPad Pro (11-inch) (3rd generation)   | `iPad13,7`       | `18`       |
-| iPad Pro (12.9-inch) (5th generation) | `iPad13,8`       | `18`       |
-| iPad Pro (12.9-inch) (5th generation) | `iPad13,9`       | `18`       |
-| iPad mini (6th generation)            | `iPad14,1`       | `21.5`     |
-| iPad Air 13-inch (M2)                 | `iPad14,10`      | `18`       |
-| iPad Air 13-inch (M2)                 | `iPad14,11`      | `18`       |
-| iPad mini (6th generation)            | `iPad14,2`       | `21.5`     |
-| iPad Pro (11-inch) (4th generation)   | `iPad14,3`       | `18`       |
-| iPad Pro (11-inch) (4th generation)   | `iPad14,4`       | `18`       |
-| iPad Pro (12.9-inch) (6th generation) | `iPad14,5`       | `18`       |
-| iPad Pro (12.9-inch) (6th generation) | `iPad14,6`       | `18`       |
-| iPad Air 11-inch (M2)                 | `iPad14,8`       | `18`       |
-| iPad Air 11-inch (M2)                 | `iPad14,9`       | `18`       |
-| iPad Air 11-inch (M3)                 | `iPad15,3`       | `18`       |
-| iPad Air 11-inch (M3)                 | `iPad15,4`       | `18`       |
-| iPad Air 13-inch (M3)                 | `iPad15,5`       | `18`       |
-| iPad Air 13-inch (M3)                 | `iPad15,6`       | `18`       |
-| iPad (A16)                            | `iPad15,7`       | `25`       |
-| iPad (A16)                            | `iPad15,8`       | `25`       |
-| iPad mini (A17 Pro)                   | `iPad16,1`       | `21.5`     |
-| iPad Air 13-inch (M4)                 | `iPad16,10`      | `18`       |
-| iPad Air 13-inch (M4)                 | `iPad16,11`      | `18`       |
-| iPad mini (A17 Pro)                   | `iPad16,2`       | `21.5`     |
-| iPad Pro 11-inch (M4)                 | `iPad16,3`       | `30`       |
-| iPad Pro 11-inch (M4)                 | `iPad16,4`       | `30`       |
-| iPad Pro 13-inch (M4)                 | `iPad16,5`       | `30`       |
-| iPad Pro 13-inch (M4)                 | `iPad16,6`       | `30`       |
-| iPad Pro (12.9-inch) (1st generation) | `iPad16,7`       | `0`        |
-| iPad Air 11-inch (M4)                 | `iPad16,8`       | `18`       |
-| iPad Air 11-inch (M4)                 | `iPad16,9`       | `18`       |
-| iPad Pro 11-inch (M5)                 | `iPad17,1`       | `30`       |
-| iPad Pro 11-inch (M5)                 | `iPad17,2`       | `30`       |
-| iPad Pro 13-inch (M5)                 | `iPad17,3`       | `30`       |
-| iPad Pro 13-inch (M5)                 | `iPad17,4`       | `30`       |
+| Device                                     | Model Identifier | Bezel Size |
+| ------------------------------------------ | ---------------- | ---------- |
+| iPad                                       | `iPad1,1`        | `0`        |
+| iPad 2                                     | `iPad2,1`        | `0`        |
+| iPad 2                                     | `iPad2,2`        | `0`        |
+| iPad 2                                     | `iPad2,3`        | `0`        |
+| iPad 2                                     | `iPad2,4`        | `0`        |
+| iPad mini                                  | `iPad2,5`        | `0`        |
+| iPad mini                                  | `iPad2,6`        | `0`        |
+| iPad mini                                  | `iPad2,7`        | `0`        |
+| iPad (3rd generation)                      | `iPad3,1`        | `0`        |
+| iPad (3rd generation)                      | `iPad3,2`        | `0`        |
+| iPad (3rd generation)                      | `iPad3,3`        | `0`        |
+| iPad (4th generation)                      | `iPad3,4`        | `0`        |
+| iPad (4th generation)                      | `iPad3,5`        | `0`        |
+| iPad (4th generation)                      | `iPad3,6`        | `0`        |
+| iPad Air                                   | `iPad4,1`        | `0`        |
+| iPad Air                                   | `iPad4,2`        | `0`        |
+| iPad Air                                   | `iPad4,3`        | `0`        |
+| iPad mini 2                                | `iPad4,4`        | `0`        |
+| iPad mini 2                                | `iPad4,5`        | `0`        |
+| iPad mini 2                                | `iPad4,6`        | `0`        |
+| iPad mini 3                                | `iPad4,7`        | `0`        |
+| iPad mini 3                                | `iPad4,8`        | `0`        |
+| iPad mini 3                                | `iPad4,9`        | `0`        |
+| iPad mini 4                                | `iPad5,1`        | `0`        |
+| iPad mini 4                                | `iPad5,2`        | `0`        |
+| iPad Air 2                                 | `iPad5,3`        | `0`        |
+| iPad Air 2                                 | `iPad5,4`        | `0`        |
+| iPad (5th generation)                      | `iPad6,11`       | `0`        |
+| iPad (5th generation)                      | `iPad6,12`       | `0`        |
+| iPad Pro (9.7-inch)                        | `iPad6,3`        | `0`        |
+| iPad Pro (9.7-inch)                        | `iPad6,4`        | `0`        |
+| iPad Pro (12.9-inch) (1st generation)      | `iPad6,7`        | `0`        |
+| iPad Pro (12.9-inch) (1st generation)      | `iPad6,8`        | `0`        |
+| iPad Pro (12.9-inch) (2nd generation)      | `iPad7,1`        | `0`        |
+| iPad (7th generation)                      | `iPad7,11`       | `0`        |
+| iPad (7th generation)                      | `iPad7,12`       | `0`        |
+| iPad Pro (12.9-inch) (2nd generation)      | `iPad7,2`        | `0`        |
+| iPad Pro (10.5-inch)                       | `iPad7,3`        | `0`        |
+| iPad Pro (10.5-inch)                       | `iPad7,4`        | `0`        |
+| iPad (6th generation)                      | `iPad7,5`        | `0`        |
+| iPad (6th generation)                      | `iPad7,6`        | `0`        |
+| iPad Pro (11-inch) (1st generation)        | `iPad8,1`        | `18`       |
+| iPad Pro (11-inch) (2nd generation)        | `iPad8,10`       | `18`       |
+| iPad Pro (12.9-inch) (4th generation)      | `iPad8,11`       | `18`       |
+| iPad Pro (12.9-inch) (4th generation)      | `iPad8,12`       | `18`       |
+| iPad Pro (11-inch) (1st generation)        | `iPad8,2`        | `18`       |
+| iPad Pro (11-inch) (1st generation)        | `iPad8,3`        | `18`       |
+| iPad Pro (11-inch) (1st generation)        | `iPad8,4`        | `18`       |
+| iPad Pro (12.9-inch) (3rd generation)      | `iPad8,5`        | `18`       |
+| iPad Pro (12.9-inch) (3rd generation)      | `iPad8,6`        | `18`       |
+| iPad Pro (12.9-inch) (3rd generation)      | `iPad8,7`        | `18`       |
+| iPad Pro (12.9-inch) (3rd generation)      | `iPad8,8`        | `18`       |
+| iPad Pro (11-inch) (2nd generation)        | `iPad8,9`        | `18`       |
+| iPad mini (5th generation)                 | `iPad11,1`       | `0`        |
+| iPad mini (5th generation)                 | `iPad11,2`       | `0`        |
+| iPad Air (3rd generation)                  | `iPad11,3`       | `0`        |
+| iPad Air (3rd generation)                  | `iPad11,4`       | `0`        |
+| iPad (8th generation)                      | `iPad11,6`       | `0`        |
+| iPad (8th generation)                      | `iPad11,7`       | `0`        |
+| iPad (9th generation)                      | `iPad12,1`       | `0`        |
+| iPad (9th generation)                      | `iPad12,2`       | `0`        |
+| iPad Air (4th generation)                  | `iPad13,1`       | `18`       |
+| iPad Pro (12.9-inch) (5th generation)      | `iPad13,10`      | `18`       |
+| iPad Pro (12.9-inch) (5th generation)      | `iPad13,11`      | `18`       |
+| iPad mini (6th generation)                 | `iPad13,12`      | `18`       |
+| iPad Air (5th generation)                  | `iPad13,16`      | `18`       |
+| iPad Air (5th generation)                  | `iPad13,17`      | `18`       |
+| iPad (10th generation)                     | `iPad13,18`      | `25`       |
+| iPad (10th generation)                     | `iPad13,19`      | `25`       |
+| iPad Air (4th generation)                  | `iPad13,2`       | `18`       |
+| iPad Pro (11-inch) (3rd generation)        | `iPad13,4`       | `18`       |
+| iPad Pro (11-inch) (3rd generation)        | `iPad13,5`       | `18`       |
+| iPad Pro (11-inch) (3rd generation)        | `iPad13,6`       | `18`       |
+| iPad Pro (11-inch) (3rd generation)        | `iPad13,7`       | `18`       |
+| iPad Pro (12.9-inch) (5th generation)      | `iPad13,8`       | `18`       |
+| iPad Pro (12.9-inch) (5th generation)      | `iPad13,9`       | `18`       |
+| iPad mini (6th generation)                 | `iPad14,1`       | `21.5`     |
+| iPad Air 13-inch (M2)                      | `iPad14,10`      | `18`       |
+| iPad Air 13-inch (M2)                      | `iPad14,11`      | `18`       |
+| iPad mini (6th generation)                 | `iPad14,2`       | `21.5`     |
+| iPad Pro (11-inch) (4th generation)        | `iPad14,3`       | `18`       |
+| iPad Pro (11-inch) (4th generation) (16GB) | `iPad14,4`       | `18`       |
+| iPad Pro (12.9-inch) (6th generation)      | `iPad14,5`       | `18`       |
+| iPad Pro (12.9-inch) (6th generation)      | `iPad14,6`       | `18`       |
+| iPad Air 11-inch (M2)                      | `iPad14,8`       | `18`       |
+| iPad Air 11-inch (M2)                      | `iPad14,9`       | `18`       |
+| iPad Air 11-inch (M3)                      | `iPad15,3`       | `18`       |
+| iPad Air 11-inch (M3)                      | `iPad15,4`       | `18`       |
+| iPad Air 13-inch (M3)                      | `iPad15,5`       | `18`       |
+| iPad Air 13-inch (M3)                      | `iPad15,6`       | `18`       |
+| iPad (A16)                                 | `iPad15,7`       | `25`       |
+| iPad (A16)                                 | `iPad15,8`       | `25`       |
+| iPad mini (A17 Pro)                        | `iPad16,1`       | `21.5`     |
+| iPad Air 13-inch (M4)                      | `iPad16,10`      | `18`       |
+| iPad Air 13-inch (M4)                      | `iPad16,11`      | `18`       |
+| iPad mini (A17 Pro)                        | `iPad16,2`       | `21.5`     |
+| iPad Pro 11-inch (M4)                      | `iPad16,3`       | `30`       |
+| iPad Pro 11-inch (M4)                      | `iPad16,4`       | `30`       |
+| iPad Pro 13-inch (M4)                      | `iPad16,5`       | `30`       |
+| iPad Pro 13-inch (M4)                      | `iPad16,6`       | `30`       |
+| iPad Pro (12.9-inch) (1st generation)      | `iPad16,7`       | `0`        |
+| iPad Air 11-inch (M4)                      | `iPad16,8`       | `18`       |
+| iPad Air 11-inch (M4)                      | `iPad16,9`       | `18`       |
+| iPad Pro 11-inch (M5)                      | `iPad17,1`       | `30`       |
+| iPad Pro 11-inch (M5)                      | `iPad17,2`       | `30`       |
+| iPad Pro 13-inch (M5)                      | `iPad17,3`       | `30`       |
+| iPad Pro 13-inch (M5)                      | `iPad17,4`       | `30`       |
 
 ## iPhone
 
