@@ -1,0 +1,214 @@
+name: Device scan
+
+# Discovers new devices from Xcode's .simdevicetype catalog, confirms anything that is not
+# yet simulator-verified by booting it, and opens pull requests with the results.
+#
+# Changes span two repositories: apple-device-database.json lives in the BezelKit-Generator
+# submodule, while bezel.min.json and SupportedDeviceList.md live here. The GitHub App must
+# therefore be installed on both, and both must be listed in the token request below.
+#
+# Required secrets: BOT_APP_CLIENT_ID, BOT_APP_PRIVATE_KEY
+# Without them the scan still runs and uploads its results as an artifact.
+
+on:
+  schedule:
+    # Monthly, 06:00 UTC on the 1st. Weekly ('0 6 * * 1') also costs nothing on a public repo
+    # and picks up new hardware sooner; run the workflow manually on release day either way.
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+    inputs:
+      verify:
+        description: 'How much to confirm by booting simulators'
+        type: choice
+        options: [unverified, flagged, none]
+        default: unverified
+      dry_run:
+        description: 'Report only — do not open pull requests'
+        type: boolean
+        default: false
+
+concurrency:
+  group: device-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    name: Scan device catalog
+    runs-on: macos-latest
+    timeout-minutes: 120
+
+    permissions:
+      contents: read
+
+    env:
+      VERIFY: ${{ inputs.verify || 'unverified' }}
+      DRY_RUN: ${{ inputs.dry_run || false }}
+      HAS_BOT: ${{ secrets.BOT_APP_CLIENT_ID != '' }}
+      SUMMARY_FILE: ${{ github.workspace }}/scan-summary.md
+
+    steps:
+      - name: Create GitHub App token
+        id: app-token
+        if: env.HAS_BOT == 'true'
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            BezelKit
+            BezelKit-Generator
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Get GitHub App user ID
+        id: app-user
+        if: env.HAS_BOT == 'true'
+        run: echo "id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+          fetch-depth: 0
+          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token || github.token }}
+
+      - name: Put the submodule on a branch
+        # actions/checkout leaves submodules in detached HEAD at the pinned commit. The scan
+        # writes to the database there, so it needs a branch to commit onto.
+        run: git -C Generator checkout main && git -C Generator pull --ff-only
+
+      - name: Select newest Xcode
+        run: |
+          set -euo pipefail
+          newest=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Selecting $newest"
+          sudo xcode-select -s "$newest/Contents/Developer"
+          xcodebuild -version
+          echo "Device types available to the scan: $(ls /Library/Developer/CoreSimulator/Profiles/DeviceTypes | wc -l)"
+
+      - name: List simulator runtimes
+        run: xcrun simctl list runtimes
+
+      - name: Run scan
+        working-directory: Generator
+        run: |
+          set -euo pipefail
+          swift run BezelGenerator scan \
+            --apply \
+            --verify "$VERIFY" \
+            --summary "$SUMMARY_FILE"
+
+      - name: Regenerate supported device list
+        working-directory: Generator
+        run: swift run BezelGenerator generate-docs
+
+      - name: Publish job summary
+        if: always()
+        run: cat "$SUMMARY_FILE" >> "$GITHUB_STEP_SUMMARY" || echo 'Scan produced no summary.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Detect changes
+        id: changes
+        run: |
+          set -euo pipefail
+          generator_dirty=$(git -C Generator status --porcelain -- apple-device-database.json)
+          package_dirty=$(git status --porcelain -- Sources/BezelKit/Resources/bezel.min.json SupportedDeviceList.md)
+
+          if [ -n "$generator_dirty" ] || [ -n "$package_dirty" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git -C Generator --no-pager diff --stat -- apple-device-database.json || true
+            git --no-pager diff --stat -- Sources/BezelKit/Resources/bezel.min.json SupportedDeviceList.md || true
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes."
+          fi
+
+      - name: Verify the package still builds
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          swift build
+          if [ -d Tests ]; then swift test; fi
+
+      - name: Upload results
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: device-scan-results
+          path: |
+            scan-summary.md
+            Generator/apple-device-database.json
+            Sources/BezelKit/Resources/bezel.min.json
+            SupportedDeviceList.md
+
+      - name: Open pull requests
+        if: steps.changes.outputs.changed == 'true' && env.DRY_RUN != 'true' && env.HAS_BOT == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          APP_USER_ID: ${{ steps.app-user.outputs.id }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          DATE=$(date -u +%Y-%m-%d)
+          BRANCH="device-scan/$DATE-${GITHUB_RUN_ID}"
+          TITLE="$DATE - Device scan"
+          MSG="$RUNNER_TEMP/commit-message.txt"
+
+          {
+            echo "$TITLE"
+            echo
+            echo "Automated scan of Xcode's .simdevicetype catalog."
+            echo
+            cat "$SUMMARY_FILE"
+          } > "$MSG"
+
+          # Commit as the app, matching the identity GitHub itself uses for bot accounts.
+          git config --global user.name  "${APP_SLUG}[bot]"
+          git config --global user.email "${APP_USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+
+          # Submodule first: the parent commit below records the SHA produced here, so merge
+          # the generator pull request first — with a merge commit, not a squash — to keep
+          # that SHA reachable from its main branch.
+          pushd Generator > /dev/null
+          if [ -n "$(git status --porcelain -- apple-device-database.json)" ]; then
+            git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${OWNER}/BezelKit-Generator.git"
+            git checkout -b "$BRANCH"
+            git add apple-device-database.json
+            git commit -F "$MSG"
+            git push origin "$BRANCH"
+            gh pr create \
+              --repo "${OWNER}/BezelKit-Generator" \
+              --base main \
+              --head "$BRANCH" \
+              --title "$TITLE" \
+              --body-file "$SUMMARY_FILE"
+          fi
+          popd > /dev/null
+
+          # Parent: package resource, docs, and the bumped submodule pointer.
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${OWNER}/BezelKit.git"
+          git checkout -b "$BRANCH"
+          git add Sources/BezelKit/Resources/bezel.min.json SupportedDeviceList.md Generator
+          git commit -F "$MSG"
+          git push origin "$BRANCH"
+          gh pr create \
+            --repo "${OWNER}/BezelKit" \
+            --base main \
+            --head "$BRANCH" \
+            --title "$TITLE" \
+            --body-file "$SUMMARY_FILE"
+
+      - name: Note missing bot credentials
+        if: steps.changes.outputs.changed == 'true' && env.HAS_BOT != 'true'
+        run: |
+          {
+            echo '> [!WARNING]'
+            echo '> Changes were found but `BOT_APP_CLIENT_ID` / `BOT_APP_PRIVATE_KEY` are not set,'
+            echo '> so no pull requests were opened. Download the `device-scan-results` artifact'
+            echo '> to apply them by hand.'
+          } >> "$GITHUB_STEP_SUMMARY"

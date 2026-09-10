@@ -326,15 +326,15 @@ There is also no way to automate zoom levels in `xcrun simctl` so it would have 
 
 ## Generating New Bezels
 
-The `Generator/` directory contains a Swift CLI tool for extracting bezel data from iOS Simulators and updating the package resource.
+Device data is refreshed automatically — a scheduled job checks Xcode's device catalog on the 1st of each month and opens pull requests when new hardware appears.
 
-Run from the `Generator/` directory:
+To check for new devices yourself, run this from the `Generator/` directory:
 
 ```bash
-swift run BezelGenerator
+swift run BezelGenerator scan --verify none
 ```
 
-See [`Generator/README`](https://github.com/markbattistella/BezelKit-Generator/) for full documentation, including subcommands and database structure.
+See [MAINTAINING.md](MAINTAINING.md) for the full maintainer runbook — how to handle the monthly pull requests, what to do the day a new iPhone launches, and how to cut a release. For the tooling itself, see the [Generator README](https://github.com/markbattistella/BezelKit-Generator/).
 
 ## Apple's Apps
 
