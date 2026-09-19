@@ -22,18 +22,23 @@ Knowing the exact bezel size can be crucial for aligning UI elements, creating i
 
 By providing an easy-to-use API, `BezelKit` allows developers to focus more on their app's functionality rather than wrestling with device metrics.
 
+> [!Important]
+> On iOS 26 and later, Apple provides a public way to match the display's corners: `ConcentricRectangle` in SwiftUI and `UICornerConfiguration` in UIKit. They follow the real display — each corner separately, in every orientation, and on both screens of iPhone Duo. Use them where you can.
+>
+> `BezelKit` is for apps that also support iOS 18 and earlier. See [iOS 26 and later](#ios-26-and-later).
+
 ## Rationale
 
 ### Quick summary
 
-> - There is **no** public API from Apple for fetching device bezel sizes
+> - Before iOS 26, there is **no** public API from Apple for fetching device bezel sizes
 > - Using the internal API can jeopardise App Store eligibility
 > - Static bezel values can cause UI distortions across devices
 > - `BezelKit` offers an easy-to-use solution for accurate bezel metrics
 
 ### Longer explanation
 
-Apple currently does not offer a public API for fetching the bezel radius of its devices.
+Before iOS 26, Apple does not offer a public API for fetching the bezel radius of its devices.
 
 Although an internal API exists, using it jeopardises the app's eligibility for the App Store — a risk that's not justifiable for a mere UI element.
 
@@ -45,7 +50,9 @@ Another consideration stems from the variability in screen bezel dimensions acro
 
 2. On older devices or those with square screens, such as the SE models, the display will inaccurately feature curved corners when it should not.
 
-While Apple has provided the [`ContainerRelativeShape`](https://developer.apple.com/documentation/swiftui/containerrelativeshape) inset, its functionality is currently limited to Widgets. For all other applications, this API reports a squared rectangle, making it unsuitable for our needs.
+While Apple has provided the [`ContainerRelativeShape`](https://developer.apple.com/documentation/swiftui/containerrelativeshape) inset, its functionality is limited to Widgets. For all other applications, this API reports a squared rectangle, making it unsuitable for our needs.
+
+iOS 26 added [`ConcentricRectangle`](https://developer.apple.com/documentation/swiftui/concentricrectangle), which does work in apps. `BezelKit` fills the gap on earlier versions.
 
 A nice looking solution would look like this:
 
@@ -82,11 +89,11 @@ dependencies: [
 ## Requirements
 
 - Swift 6.0+
-- iOS 12+
-- macOS 10.13+
-- Mac Catalyst 13.1+
-- tvOS 12+
-- watchOS 4+
+- iOS 15+
+- macOS 12+
+- Mac Catalyst 15+
+- tvOS 15+
+- watchOS 9+
 - visionOS 1+
 
 ## Usage
@@ -109,6 +116,76 @@ Using `BezelKit` is simple and can help you avoid complexities related to device
 
 For advanced usage, including perfect scaling of UI elements and setting fallback sizes, read the sections below.
 
+### iOS 26 and later
+
+On iOS 26 and later, use Apple's `ConcentricRectangle`, and fall back to `BezelKit` on earlier versions:
+
+```swift
+import SwiftUI
+import BezelKit
+
+struct ContentView: View {
+  var body: some View {
+    if #available(iOS 26, *) {
+      ConcentricRectangle()
+        .stroke(.green, lineWidth: 20)
+        .ignoresSafeArea()
+    } else {
+      RoundedRectangle(cornerRadius: .deviceBezel)
+        .stroke(.green, lineWidth: 20)
+        .ignoresSafeArea()
+    }
+  }
+}
+```
+
+`ConcentricRectangle` takes its corners from the display it's on, so it handles rotation and devices with more than one screen for you.
+
+If your app's minimum is iOS 26 or later, `.deviceBezel` and `deviceBezel(with:)` show a deprecation warning pointing you here. Apps that support earlier versions see no warning.
+
+#### Choosing which corners follow the display
+
+Each corner can follow the display (`.concentric`) or use a fixed radius (`.fixed`). For example, square top corners with bottom corners that match the display (the `UnevenRoundedRectangle` fallback needs iOS 16 or later):
+
+```swift
+if #available(iOS 26, *) {
+  ConcentricRectangle(
+    topLeadingCorner: .fixed(0),
+    topTrailingCorner: .fixed(0),
+    bottomLeadingCorner: .concentric,
+    bottomTrailingCorner: .concentric
+  )
+} else {
+  UnevenRoundedRectangle(
+    topLeadingRadius: 0,
+    bottomLeadingRadius: .deviceBezel,
+    bottomTrailingRadius: .deviceBezel,
+    topTrailingRadius: 0
+  )
+}
+```
+
+> [!Warning]
+> Set each corner individually, as above. The `uniform…` initialisers, such as `ConcentricRectangle(uniformTopCorners:uniformBottomCorners:)`, give both corners the larger of the two radii. On iPhone Duo's outer screen, whose hinge-side corners are much tighter than the others, that rounds the bottom-left corner to 59 points instead of 8.
+
+#### UIKit
+
+Set a concentric corner configuration on the view:
+
+```swift
+view.cornerConfiguration = .corners(radius: .containerConcentric())
+```
+
+If you need the number itself, read it back once the view is laid out:
+
+```swift
+let radius = view.effectiveRadius(corner: .bottomLeft)
+```
+
+#### iPhone Duo and other multi-screen devices
+
+`CGFloat.deviceBezel` is a single number, so it can't describe a screen whose corners differ. On iPhone Duo it returns `59`, which matches the outer screen's rounded corners but not its hinge-side corners or the inner screen. iPhone Duo always runs iOS 27.1 or later, so use `ConcentricRectangle` there.
+
 ### Perfect Scaling
 
 The `BezelKit` package not only provides an easy way to access device-specific bezel sizes but also enables perfect scaling of rounded corners within the UI.
@@ -127,6 +204,8 @@ By following this approach, you can ensure that your UI elements scale perfectly
 ![Perfect scaling](https://raw.githubusercontent.com/markbattistella/BezelKit/main/data/ratio.jpg)
 
 You can use the `deviceBezel(with:)` function to pass in the margin size, and it will return the device bezel but perfectly scaled with the inner ratio.
+
+On iOS 26 and later, `ConcentricRectangle` does this for you, working out each corner from where the view sits on screen.
 
 ### Setting a Fallback Bezel Size
 

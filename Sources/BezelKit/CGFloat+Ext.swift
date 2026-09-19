@@ -28,6 +28,14 @@ extension CGFloat {
     ///
     /// - Returns: The device’s bezel width as a `CGFloat`, or a fallback/default value if none
     /// available.
+    ///
+    /// - Note: On iOS 26 and later, use `ConcentricRectangle` in SwiftUI or a
+    /// `.containerConcentric()` corner configuration in UIKit. They follow the display's actual
+    /// corners, including screens whose corners differ, such as iPhone Duo's outer screen.
+    @available(
+        iOS, deprecated: 26.0,
+        message: "Use ConcentricRectangle (SwiftUI) or UICornerConfiguration with .containerConcentric() (UIKit), which follow the display's actual corners."
+    )
     public static var deviceBezel: CGFloat {
         
         #if os(iOS) && !targetEnvironment(macCatalyst)
@@ -70,6 +78,13 @@ extension CGFloat {
     ///
     /// - Parameter margin: A margin to subtract from the computed bezel value.
     /// - Returns: The bezel value minus the given margin.
+    ///
+    /// - Note: On iOS 26 and later, `ConcentricRectangle` works out the inner radius from where
+    /// the view sits on screen.
+    @available(
+        iOS, deprecated: 26.0,
+        message: "Use ConcentricRectangle (SwiftUI) or UICornerConfiguration with .containerConcentric() (UIKit), which follow the display's actual corners."
+    )
     public static func deviceBezel(with margin: CGFloat) -> CGFloat {
         deviceBezel.innerRadius(with: margin)
     }
