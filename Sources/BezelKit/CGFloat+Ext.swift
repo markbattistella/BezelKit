@@ -8,7 +8,6 @@ import Foundation
 
 @MainActor
 extension CGFloat {
-
     /// A configurable set of fallback values per platform, used when bezel data is unavailable
     /// or zero.
     static internal var fallbackConfig = FallbackConfig()
@@ -33,11 +32,12 @@ extension CGFloat {
     /// `.containerConcentric()` corner configuration in UIKit. They follow the display's actual
     /// corners, including screens whose corners differ, such as iPhone Duo's outer screen.
     @available(
-        iOS, deprecated: 26.0,
-        message: "Use ConcentricRectangle (SwiftUI) or UICornerConfiguration with .containerConcentric() (UIKit), which follow the display's actual corners."
+        iOS,
+        deprecated: 26.0,
+        message:
+            "Use ConcentricRectangle (SwiftUI) or UICornerConfiguration with .containerConcentric() (UIKit), which follow the display's actual corners."
     )
     public static var deviceBezel: CGFloat {
-        
         #if os(iOS) && !targetEnvironment(macCatalyst)
 
         let current = DeviceBezel.currentBezel ?? 0
@@ -82,8 +82,10 @@ extension CGFloat {
     /// - Note: On iOS 26 and later, `ConcentricRectangle` works out the inner radius from where
     /// the view sits on screen.
     @available(
-        iOS, deprecated: 26.0,
-        message: "Use ConcentricRectangle (SwiftUI) or UICornerConfiguration with .containerConcentric() (UIKit), which follow the display's actual corners."
+        iOS,
+        deprecated: 26.0,
+        message:
+            "Use ConcentricRectangle (SwiftUI) or UICornerConfiguration with .containerConcentric() (UIKit), which follow the display's actual corners."
     )
     public static func deviceBezel(with margin: CGFloat) -> CGFloat {
         deviceBezel.innerRadius(with: margin)
@@ -98,12 +100,11 @@ extension CGFloat {
 }
 
 extension Numeric where Self: Comparable {
-
     /// Subtracts the given margin from the current value.
     ///
     /// - Parameter margin: The value to subtract.
     /// - Returns: The result of `self - margin`.
     internal func innerRadius(with margin: Self) -> Self {
-        return self - margin
+        self - margin
     }
 }
