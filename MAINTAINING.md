@@ -2,16 +2,14 @@
 
 How to keep the device data up to date. This is the maintainer's runbook — for how the tooling works internally, see the [Generator README](https://github.com/markbattistella/BezelKit-Generator/).
 
-Most of the time you do nothing: a scheduled job checks for new devices on the 1st of each month and opens pull requests if anything changed.
+Device data is updated by hand, locally, when Apple releases new hardware. There is no scheduled job: GitHub's runner images lag behind new Xcode releases, so a hosted scan can miss new devices for weeks.
 
 ## Quick reference
 
 | Situation | What to do |
 | --------- | ---------- |
-| It's a normal month | Nothing. Wait for the CI pull requests |
-| CI opened pull requests | [Merge them, generator first](#when-ci-opens-pull-requests) |
 | A new iPhone or iPad just launched | [Run it locally the same day](#a-new-device-just-launched) |
-| You want to check right now | [Trigger a scan by hand](#running-a-scan-by-hand) |
+| You want to check right now | [Run a scan](#running-a-scan) |
 | A device says "needs a simulator boot" | [Confirm it](#when-a-device-needs-checking) |
 | Wondering when a version gets tagged | [Releases and tags](#releases-and-tags) |
 | Something's broken | [Troubleshooting](#troubleshooting) |
@@ -22,61 +20,13 @@ All local commands run from the `Generator/` directory unless stated otherwise.
 
 You only need this once per machine.
 
-1. Install the GitHub CLI, used by the release step:
-
-    ```bash
-    brew install gh && gh auth login
-    ```
-
-2. Let the bot open pull requests.
-
-    Device data lives in the `BezelKit-Generator` submodule while the package resource lives in this repo, so:
-
-    - Install the app on **both** `BezelKit` and `BezelKit-Generator`, with read and write access to contents and pull requests.
-    - Add `BOT_APP_CLIENT_ID` and `BOT_APP_PRIVATE_KEY` under **Settings → Secrets and variables → Actions** in the `BezelKit` repo — the same values the website repo uses.
-
-    Pull requests then arrive authored by the bot rather than `github-actions`.
-
-    Without those secrets the scan still runs and uploads its results as a downloadable artifact — it just can't open the pull requests for you.
-
-## The monthly run
-
-The [`Device scan`](.github/workflows/device-scan.yml) workflow runs at 06:00 UTC on the 1st of each month. It reads the device catalog from the newest Xcode on the runner, boots simulators to confirm anything not yet verified, and opens pull requests only if something actually changed.
-
-It costs nothing — public repositories get unlimited standard runner minutes.
-
-### When CI opens pull requests
-
-You'll get two, one per repository. The summary on the Actions run tells you what changed.
-
-1. Review and merge the **`BezelKit-Generator`** pull request first. It contains the device database.
-
-    > [!IMPORTANT]
-    > Use **Create a merge commit**, not squash. The BezelKit pull request points at that branch's exact commit; squashing creates a different commit and breaks the submodule pointer.
-
-2. Review and merge the **`BezelKit`** pull request. It contains `bezel.min.json`, `SupportedDeviceList.md`, and the bumped submodule pointer.
-
-3. Optionally cut a release:
-
-    ```bash
-    cd Generator
-    git pull && swift run BezelGenerator generate-docs --release
-    ```
-
-If you squashed by accident, repoint the submodule on the BezelKit branch before merging it:
-
 ```bash
-git submodule update --remote Generator
-git add Generator && git commit --amend --no-edit && git push --force-with-lease
+brew install gh && gh auth login
 ```
 
-### When nothing appears
-
-No pull requests means no new devices and no changes. Nothing to do.
+The GitHub CLI is used by the release step to publish the GitHub release.
 
 ## A new device just launched
-
-CI won't see brand-new hardware until GitHub's runner images pick up the matching Xcode, which can take weeks. On launch day, run it yourself.
 
 1. Install the new Xcode (beta or RC is fine) alongside your existing one — don't replace it.
 
@@ -108,18 +58,7 @@ CI won't see brand-new hardware until GitHub's runner images pick up the matchin
 
 You do **not** need a VM, and you do **not** need to add anything to `pending` by hand. Devices are discovered from Xcode automatically.
 
-## Running a scan by hand
-
-### From GitHub
-
-Go to **Actions → Device scan → Run workflow**. Two options:
-
-| Input | Use |
-| ----- | --- |
-| `verify` | `unverified` confirms everything not yet simulator-checked (default). `flagged` only checks what's uncertain. `none` reports without booting anything |
-| `dry_run` | Tick to see results without opening pull requests |
-
-### Locally
+## Running a scan
 
 ```bash
 cd Generator
@@ -167,13 +106,13 @@ To check one device in isolation without touching the database:
 swift run BezelGenerator test --name "iPhone 18 Pro"
 ```
 
-If no runtime exists yet, install one via **Xcode → Settings → Components**, or leave it — the next monthly run will pick it up.
+If no runtime exists yet, install one via **Xcode → Settings → Components**, or leave it and scan again once it's available.
 
 ## Releases and tags
 
 For Swift Package Manager the tag **is** the release — a commit on `main` with no tag reaches nobody depending on a version rule. So tagging isn't optional bookkeeping; it's how the data ships.
 
-This is automatic. The [`Auto tag`](.github/workflows/auto-tag.yml) workflow fires when `bezel.min.json` changes on `main`, which means a merged device scan pull request tags and releases itself. Changes to the generator, workflows or documentation are deliberately **not** tagged — there's nothing in them for a consumer to consume.
+`generate-docs --release` tags and publishes for you. As a safety net, the [`Auto tag`](.github/workflows/auto-tag.yml) workflow also fires when `bezel.min.json` changes on `main` and tags it if the commit isn't already tagged, so the two never collide. Changes to the generator, workflows or documentation are deliberately **not** tagged — there's nothing in them for a consumer to consume.
 
 Release notes are generated by diffing the resource, split into added devices and updated ones (bezel corrections and renames).
 
@@ -187,10 +126,6 @@ CalVer, `yy.m.d`, **never zero-padded**:
 ```
 
 If two releases land on the same day the day component doubles as a counter, so a second release on the 10th becomes `26.9.11`. Versions stay valid and strictly increasing, which is all SwiftPM needs.
-
-### Releasing by hand
-
-`generate-docs --release` still works and still tags. The auto-tag workflow skips any commit that already carries a tag, so the two never collide — use whichever suits.
 
 > [!NOTE]
 > With CalVer, the year is the major version, so `from: "26.0.0"` in a consumer's manifest stops resolving once tags reach `27.x`. Each January the README's install snippet needs bumping to the new year, and consumers have to update their manifests to keep receiving device data.
@@ -206,8 +141,6 @@ If two releases land on the same day the day component doubles as a counter, so 
 | `generate-docs` | Rebuild `SupportedDeviceList.md` |
 | `generate-docs --release` | Commit both repos, push, tag, publish a GitHub release |
 
-Tagging otherwise happens on its own — see [Releases and tags](#releases-and-tags).
-
 ## Troubleshooting
 
 **"No `.simdevicetype` bundles found"**
@@ -216,17 +149,8 @@ No Xcode is selected, or the selected one is incomplete. Check with `xcode-selec
 **A new device doesn't appear at all**
 Your Xcode is too old to know about it. Install the newest Xcode and point `DEVELOPER_DIR` at it.
 
-**CI found changes but opened no pull requests**
-The `BOT_APP_CLIENT_ID` / `BOT_APP_PRIVATE_KEY` secrets are missing, or the app isn't installed on both repositories. Download the `device-scan-results` artifact from the run to apply the changes by hand, then fix the setup.
-
-**CI fails at "Create GitHub App token"**
-The app isn't installed on one of the two repositories, or its installation lacks write access to contents and pull requests. Both `BezelKit` and `BezelKit-Generator` must be covered.
-
 **A device fails with "App installation failed"**
-The device is too old to run the helper app — `iPad6,7` and `iPad6,8` do this. It stays catalog-derived and gets retried each month. Harmless.
+The device is too old to run the helper app — `iPad6,7` and `iPad6,8` do this. It stays catalog-derived and gets retried on each scan. Harmless.
 
-**The same devices get flagged every single month**
+**The same devices get flagged on every scan**
 They shouldn't — a confirmed device records the catalog value it was checked against and won't be re-opened. If it keeps happening, the boot isn't being recorded; check that the scan ran with `--apply`.
-
-**The submodule pointer is broken after a merge**
-The generator pull request was squashed. See [When CI opens pull requests](#when-ci-opens-pull-requests).
