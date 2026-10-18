@@ -35,6 +35,30 @@ internal struct Database: Decodable, Sendable {
 
       /// A human-readable name of the device (e.g., "iPhone 14 Pro").
       let name: String
+
+      /// Per-screen corner radii, present only on devices whose screens differ, such as
+      /// iPhone Duo. Absent everywhere else, where `bezel` describes all four corners.
+      let screens: [Screen]?
+
+      /// The corner radii of one screen, with the device held upright.
+      internal struct Screen: Decodable, Sendable {
+
+        /// A human-readable label such as `Outer`. Informational only.
+        let name: String?
+
+        /// `UIScreen.nativeBounds` size in pixels, used to tell which screen is active.
+        let nativeSize: [Double]
+
+        /// The physical corner radii in points.
+        let corners: Corners
+
+        internal struct Corners: Decodable, Sendable {
+          let topLeft: Double
+          let topRight: Double
+          let bottomLeft: Double
+          let bottomRight: Double
+        }
+      }
     }
   }
 }

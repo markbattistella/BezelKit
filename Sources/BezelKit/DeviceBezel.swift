@@ -35,6 +35,9 @@ public final class DeviceBezel {
   /// A cache mapping device model identifiers (e.g., `"iPhone14,2"`) to their bezel sizes.
   private static var cache: [String: CGFloat] = [:]
 
+  /// The decoded entry for each device model identifier, kept so per-screen data stays reachable.
+  internal static var infoCache: [String: Database.Devices.DeviceInfo] = [:]
+
   /// An optional callback for handling errors encountered during data loading.
   public static var errorCallback: ((DeviceBezelError) -> Void)?
 
@@ -73,6 +76,7 @@ public final class DeviceBezel {
   private static func cacheDeviceType(_ deviceType: [String: Database.Devices.DeviceInfo]) {
     for (identifier, deviceInfo) in deviceType {
       cache[identifier] = CGFloat(deviceInfo.bezel)
+      infoCache[identifier] = deviceInfo
     }
   }
 }
@@ -83,12 +87,25 @@ public final class DeviceBezel {
 
     /// The bezel size of the current device, if available.
     ///
+    /// On multi-screen devices this is the largest corner of the screen the app is on.
+    ///
     /// This property attempts to return the bezel size for the current device model by looking it
     /// up in the cached database. If the data has not yet been loaded, it tries to load and decode
     /// the JSON resource.
     ///
     /// - Returns: A `CGFloat` representing the bezel size in points, or `nil` if unavailable.
     internal static var currentBezel: CGFloat? {
+      currentCorners?.largest
+    }
+
+    /// The corners of the screen the app is on right now, if the device is known.
+    ///
+    /// Devices with a single uniform display resolve to one radius on every corner. Multi-screen
+    /// devices resolve to the active screen's corners, turned to match the interface orientation.
+    ///
+    /// - Returns: The current corners, or `nil` if the data is unavailable or the device is
+    /// unknown.
+    internal static var currentCorners: BezelCorners? {
       if devices == nil {
         do {
           try loadDeviceData()
@@ -104,8 +121,50 @@ public final class DeviceBezel {
         }
       }
 
-      let identifier = UIDevice.current.modelIdentifier
-      return cache[identifier]
+      guard let info = infoCache[UIDevice.current.modelIdentifier] else { return nil }
+
+      let display = activeDisplay
+      return info.corners(nativeSize: display?.nativeSize, orientation: display?.orientation ?? .portrait)
+    }
+
+    /// The screen the app is currently shown on and how its interface is turned.
+    ///
+    /// Read from the window scene rather than a global screen, since a device like iPhone Duo
+    /// has more than one. `UIApplication` is reached by selector because it is unavailable to
+    /// app extensions at compile time, and this package must still build for them.
+    private static var activeDisplay: (nativeSize: CGSize, orientation: DisplayOrientation)? {
+      let selector = NSSelectorFromString("sharedApplication")
+      guard
+        UIApplication.responds(to: selector),
+        let application = UIApplication.perform(selector)?.takeUnretainedValue() as? UIApplication
+      else { return nil }
+
+      let scenes = application.connectedScenes.compactMap { $0 as? UIWindowScene }
+      guard
+        let scene = scenes.first(where: { $0.activationState == .foregroundActive })
+          ?? scenes.first(where: { $0.activationState == .foregroundInactive })
+          ?? scenes.first
+      else { return nil }
+
+      let orientation: UIInterfaceOrientation
+      if #available(iOS 16.0, *) {
+        orientation = scene.effectiveGeometry.interfaceOrientation
+      } else {
+        orientation = scene.interfaceOrientation
+      }
+
+      return (scene.screen.nativeBounds.size, DisplayOrientation(orientation))
+    }
+  }
+
+  extension DisplayOrientation {
+    fileprivate init(_ orientation: UIInterfaceOrientation) {
+      switch orientation {
+      case .portraitUpsideDown: self = .portraitUpsideDown
+      case .landscapeLeft: self = .landscapeLeft
+      case .landscapeRight: self = .landscapeRight
+      default: self = .portrait
+      }
     }
   }
 

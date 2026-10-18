@@ -184,7 +184,31 @@ let radius = view.effectiveRadius(corner: .bottomLeft)
 
 #### iPhone Duo and other multi-screen devices
 
-`CGFloat.deviceBezel` is a single number, so it can't describe a screen whose corners differ. On iPhone Duo it returns `59`, which matches the outer screen's rounded corners but not its hinge-side corners or the inner screen. iPhone Duo always runs iOS 27.1 or later, so use `ConcentricRectangle` there.
+`CGFloat.deviceBezel` is a single number, so it can't describe a screen whose corners differ. On these devices it returns the largest corner of the screen the app is on: `59` on iPhone Duo's outer screen and `55` on its inner screen.
+
+To get each corner, read `CGFloat.deviceBezelCorners`. It picks the active screen, then turns that screen's corners to match the interface orientation, so the values follow the glass as the device is folded or rotated:
+
+```swift
+let corners = CGFloat.deviceBezelCorners
+
+UnevenRoundedRectangle(
+  topLeadingRadius: corners.topLeft,
+  bottomLeadingRadius: corners.bottomLeft,
+  bottomTrailingRadius: corners.bottomRight,
+  topTrailingRadius: corners.topRight
+)
+```
+
+The corners are named for what you see, so `topLeft` is always the top left of your interface, whatever the layout direction. Every other device returns the same radius on all four. Read the value again when the scene's size or orientation changes, since a static property can't tell you when that happens.
+
+| iPhone Duo screen | Top left | Top right | Bottom left | Bottom right |
+| ----------------- | -------- | --------- | ----------- | ------------ |
+| Outer, portrait   | 8        | 59        | 8           | 59           |
+| Outer, landscape (left) | 8  | 8         | 59          | 59           |
+| Inner, any        | 55       | 55        | 55          | 55           |
+
+> [!Note]
+> These are the display's own corners. A window that doesn't reach the screen edge, such as one beside the Duo's system bar, has rounder corners of its own, and only `ConcentricRectangle` or `UICornerConfiguration` follows those. On iOS 26 and later, prefer them where you can.
 
 ### Perfect Scaling
 

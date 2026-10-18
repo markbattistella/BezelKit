@@ -15,6 +15,9 @@ extension CGFloat {
     /// The bezel width of the current device, using actual data where available, or falling back
     /// to a configured default value when appropriate.
     ///
+    /// On devices whose corners differ, such as iPhone Duo, this is the largest corner of the
+    /// screen the app is on. Use ``deviceBezelCorners`` to get each corner.
+    ///
     /// This property checks the current platform and applies the corresponding fallback only if
     /// `applyIfZero` is set to `true`.
     ///
@@ -69,6 +72,32 @@ extension CGFloat {
         return 0
 
         #endif
+    }
+
+    /// The corner radii of the display the app is on right now, one per corner.
+    ///
+    /// Use this instead of ``deviceBezel`` on devices whose corners differ. On iPhone Duo the
+    /// outer screen is tight on one edge and round on the other, and the inner screen is
+    /// different again. This picks the screen the app is on and turns its corners to match the
+    /// interface orientation, so the values follow the glass as the device is folded or rotated.
+    /// Read it again when the scene's size or orientation changes.
+    ///
+    /// Every other device returns the same radius on all four corners, equal to ``deviceBezel``.
+    /// Platforms without data return the configured fallback on all four corners.
+    ///
+    /// - Note: This describes the display's own corners. A window that does not reach the edge of
+    /// the screen, such as one beside the Duo's system bar, has rounder corners of its own.
+    /// On iOS 26 and later, `ConcentricRectangle` follows those too.
+    public static var deviceBezelCorners: BezelCorners {
+        #if os(iOS) && !targetEnvironment(macCatalyst)
+
+        if let current = DeviceBezel.currentCorners, current.largest > .zero {
+            return current
+        }
+
+        #endif
+
+        return BezelCorners(uniform: deviceBezel)
     }
 
     /// Returns the device bezel with an optional margin subtracted from it.

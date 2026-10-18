@@ -198,6 +198,15 @@ Below is the current supported list of devices `BezelKit` can return data for.
 | iPod touch (6th generation) | `iPod7,1`        | `0`        |
 | iPod touch (7th generation) | `iPod9,1`        | `0`        |
 
+## Multi-screen devices
+
+These devices have screens with different corner radii. `BezelKit` picks the active screen and rotates its corners to match the interface orientation. Values are the physical corners with the device held upright (portrait), in points.
+
+| Device     | Model Identifier | Screen | Native Size (px) | Top Left | Top Right | Bottom Left | Bottom Right |
+| ---------- | ---------------- | ------ | ---------------- | -------- | --------- | ----------- | ------------ |
+| iPhone Duo | `iPhone19,4`     | Outer  | 1398 × 2034      | 8        | 59        | 8           | 59           |
+| iPhone Duo | `iPhone19,4`     | Inner  | 2007 × 2853      | 55       | 55        | 55          | 55           |
+
 ---
 
 | Author                                          | Project                   |
